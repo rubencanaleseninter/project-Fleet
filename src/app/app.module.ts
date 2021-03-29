@@ -17,6 +17,8 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputSwitchModule } from 'primeng/inputswitch';
+import {CalendarModule} from 'primeng/calendar';
+import {MultiSelectModule} from 'primeng/multiselect';
 
 @NgModule({
   declarations: [AppComponent],
@@ -36,6 +38,8 @@ import { InputSwitchModule } from 'primeng/inputswitch';
     DropdownModule,
     InputTextareaModule,
     InputSwitchModule,
+    CalendarModule,
+    MultiSelectModule
   ],
   providers: [ApiService, MessageService],
   bootstrap: [AppComponent],

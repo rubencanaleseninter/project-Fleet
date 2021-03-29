@@ -27,10 +27,7 @@
           />
         </div>
         <div class="col">
-          <button
-            class="btn btn-primary"
-            (click)="this.displayAddVehicle = true"
-          >
+          <button class="btn btn-primary" (click)="showAddVehicle()">
             Añadir vehículo
           </button>
         </div>
@@ -117,10 +114,7 @@
           />
         </div>
         <div class="col">
-          <button
-            class="btn btn-primary"
-            (click)="this.displayAddDriver = true"
-          >
+          <button class="btn btn-primary" (click)="showAddDriver()">
             Añadir Conductor
           </button>
         </div>
@@ -178,9 +172,8 @@
   [style]="{ width: '50vw' }"
   [modal]="true"
   [(visible)]="displayAddDriver"
-  (onHide)="formDriverGroup.reset(); formVehicleGroup.markAsUntouched()"
 >
-  <form [formGroup]="formDriverGroup" style="min-height: 400px">
+  <form [formGroup]="formDriverGroup" class="form">
     <div *ngFor="let col of driverCols; let n = index">
       <label [for]="col.field">{{ col.header }} </label>
       <div class="col-5 mt-2 mb-4">
@@ -196,13 +189,14 @@
           [formControlName]="col.field"
           [name]="col.field"
         />
-        <p-dropdown
+        <p-multiSelect
           *ngIf="col.type === 'select'"
           optionLabel="name"
           optionValue="value"
+          defaultLabel="Selecciona una opción"
           [options]="col.options"
           [formControlName]="col.field"
-        ></p-dropdown>
+        ></p-multiSelect>
       </div>
     </div>
   </form>
@@ -231,9 +225,8 @@
   [style]="{ width: '50vw' }"
   [modal]="true"
   [(visible)]="displayEditDriver"
-  (onHide)="formDriverGroup.reset(); formVehicleGroup.markAsUntouched()"
 >
-  <form [formGroup]="formDriverGroup" style="min-height: 400px">
+  <form [formGroup]="formDriverGroup" class="form">
     <div *ngFor="let col of driverCols; let n = index">
       <label [for]="col.field">{{ col.header }} </label>
       <div class="col-5 mt-2 mb-4">
@@ -248,13 +241,14 @@
           [formControlName]="col.field"
           [name]="col.field"
         />
-        <p-dropdown
+        <p-multiSelect
           *ngIf="col.type === 'select'"
           optionLabel="name"
           optionValue="value"
+          defaultLabel="Selecciona una opción"
           [options]="col.options"
           [formControlName]="col.field"
-        ></p-dropdown>
+        ></p-multiSelect>
       </div>
     </div>
   </form>
@@ -286,7 +280,6 @@
   [closeOnEscape]="true"
   [style]="{ width: '50vw' }"
   [modal]="true"
-  (onHide)="formDriverGroup.reset(); formVehicleGroup.markAsUntouched()"
 >
   <div *ngFor="let item of apiService.selectedDriver | keyvalue">
     <b>{{ item.key }}: </b>
@@ -300,7 +293,6 @@
   [(visible)]="displayAddVehicle"
   [style]="{ width: '50vw' }"
   [modal]="true"
-  (onHide)="formVehicleGroup.reset(); formVehicleGroup.markAsUntouched()"
 >
   <form [formGroup]="formVehicleGroup">
     <div *ngFor="let col of vehicleCols; let n = index" class="row">
@@ -322,6 +314,7 @@
           *ngIf="col.type === 'select'"
           optionLabel="name"
           optionValue="value"
+          placeholder="Selecciona una opción"
           [options]="col.options"
           [formControlName]="col.field"
         ></p-dropdown>
@@ -336,6 +329,14 @@
           *ngIf="col.type === 'checkbox'"
           [formControlName]="col.field"
         ></p-inputSwitch>
+        <p-calendar
+          *ngIf="col.type === 'date'"
+          [formControlName]="col.field"
+          dateFormat="dd.mm.yy"
+          [showButtonBar]="true"
+          [locale]="apiService.calendar.es"
+          [defaultDate]="apiService.calendar.today"
+        ></p-calendar>
       </div>
     </div>
   </form>
@@ -364,7 +365,6 @@
   [(visible)]="displayEditVehicle"
   [style]="{ width: '50vw' }"
   [modal]="true"
-  (onHide)="formVehicleGroup.reset(); formVehicleGroup.markAsUntouched()"
 >
   <form [formGroup]="formVehicleGroup">
     <div *ngFor="let col of vehicleCols; let n = index">
@@ -386,6 +386,7 @@
           *ngIf="col.type === 'select'"
           optionLabel="name"
           optionValue="value"
+          placeholder="Selecciona una opción"
           [options]="col.options"
           [formControlName]="col.field"
         ></p-dropdown>
@@ -400,6 +401,14 @@
           *ngIf="col.type === 'checkbox'"
           [formControlName]="col.field"
         ></p-inputSwitch>
+        <p-calendar
+          *ngIf="col.type === 'date'"
+          [formControlName]="col.field"
+          dateFormat="dd.mm.yy"
+          [showButtonBar]="true"
+          [locale]="apiService.calendar.es"
+          [defaultDate]="apiService.calendar.today"
+        ></p-calendar>
       </div>
     </div>
   </form>
@@ -429,7 +438,6 @@
   [dismissableMask]="true"
   [style]="{ width: '50vw' }"
   [modal]="true"
-  (onHide)="formVehicleGroup.reset(); formVehicleGroup.markAsUntouched()"
 >
   <div *ngFor="let item of apiService.selectedVehicle | keyvalue">
     <b>{{ item.key }}: </b>

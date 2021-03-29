@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { forkJoin, Observable } from 'rxjs';
@@ -136,6 +136,7 @@ export class AppComponent implements OnInit {
         disabled: false,
         required: true,
         options: [
+          { name: 'No asignado', value: 0 },
           { name: 'banco', value: 1 },
           { name: 'renting', value: 2 },
           { name: 'leasing', value: 3 },
@@ -144,7 +145,7 @@ export class AppComponent implements OnInit {
       {
         field: 'fechaalta',
         header: 'Fecha de alta',
-        type: 'input',
+        type: 'date',
         disabled: false,
         required: true,
       },
@@ -169,6 +170,7 @@ export class AppComponent implements OnInit {
         disabled: false,
         required: true,
         options: [
+          { name: 'No asignado', value: 0 },
           { name: 'turismo', value: 1 },
           { name: 'comercial', value: 2 },
           { name: 'motocicleta', value: 3 },
@@ -181,10 +183,11 @@ export class AppComponent implements OnInit {
         disabled: false,
         required: true,
         options: [
-          { name: 'gasolina', value: '1' },
-          { name: 'diesel', value: '2' },
-          { name: 'híbrido', value: '3' },
-          { name: 'eléctrico', value: '4' },
+          { name: 'No asignado', value: 0 },
+          { name: 'gasolina', value: 1 },
+          { name: 'diesel', value: 2 },
+          { name: 'híbrido', value: 3 },
+          { name: 'eléctrico', value: 4 },
         ],
       },
       {
@@ -275,6 +278,16 @@ export class AppComponent implements OnInit {
   showEditVehicle(rowData: Vehicle): void {
     this.displayEditVehicle = true;
     this.formVehicleGroup.patchValue(rowData);
+  }
+
+  showAddVehicle(): void {
+    this.formVehicleGroup.reset();
+    this.displayAddVehicle = true;
+  }
+
+  showAddDriver(): void {
+    this.formDriverGroup.reset();
+    this.displayAddDriver = true;
   }
 
   saveDriver(isNew: boolean = false): void {

@@ -21,47 +21,54 @@ export class ApiService {
   selectedVehicle: any;
   selectedDriver$ = new Subject<Driver>();
   selectedDriver: any;
-  // MOCK
-  vehicles: Vehicle[] = [
-    new Vehicle(
-      1,
-      '99999GXW',
-      'fsfdsfdsfdsfds',
-      3,
-      1,
-      '',
-      1,
-      0,
-      2,
-      2,
-      1,
-      123123,
-      8000,
-      1250,
-      1,
-      'Al coche fantástico no le funciona el Aire'
-    ),
-    new Vehicle(
-      2,
-      '12345HFM',
-      'asd-asd-asd',
-      3,
-      1,
-      '',
-      1,
-      0,
-      2,
-      2,
-      1,
-      8567,
-      8000,
-      970,
-      0,
-      'Cuidado con el asiento de piel'
-    ),
-  ];
 
-  drivers: Driver[] = [new Driver(1, 'Antonio', 1), new Driver(2, 'Manolo', 2)];
+  calendar = {
+    es: {
+      firstDayOfWeek: 1,
+      dayNames: [
+        'domingo',
+        'lunes',
+        'martes',
+        'miércoles',
+        'jueves',
+        'viernes',
+        'sábado',
+      ],
+      dayNamesShort: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
+      dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
+      monthNames: [
+        'enero',
+        'febrero',
+        'marzo',
+        'abril',
+        'mayo',
+        'junio',
+        'julio',
+        'agosto',
+        'septiembre',
+        'octubre',
+        'noviembre',
+        'diciembre',
+      ],
+      monthNamesShort: [
+        'ene',
+        'feb',
+        'mar',
+        'abr',
+        'may',
+        'jun',
+        'jul',
+        'ago',
+        'sep',
+        'oct',
+        'nov',
+        'dic',
+      ],
+      today: 'Hoy',
+      clear: 'Borrar',
+    },
+    today: new Date(),
+  };
 
   constructor(private http: HttpClient) {}
 
@@ -109,6 +116,7 @@ export class ApiService {
     //   .pipe(catchError((err) => throwError(err)));
 
     /** LOCAL JSON */
+    // FIXME: Remove fake calls
     return this.http
       .get<Vehicle[]>('/assets/vehicles.json')
       .pipe(catchError((err) => throwError(err)));
@@ -124,6 +132,7 @@ export class ApiService {
     //   .pipe(catchError((err) => throwError(err)));
 
     /** LOCAL JSON */
+    // FIXME: Remove fake calls
     return this.http
       .get<Driver[]>('/assets/drivers.json')
       .pipe(catchError((err) => throwError(err)));
@@ -133,24 +142,19 @@ export class ApiService {
    * Get a specific vehicle
    * @param id vehicle code
    */
-  getVehicle(id: number): Observable<any> {
-    // return this.http
-    //   .post<Vehicle[]>(this.GATEWAY + this.API + this.VEHICLE, id)
-    //   .pipe(catchError((err) => throwError(err)));
-    const selectedVehicle = this.vehicles.find((vh) => vh.id === id);
-    const vehicle = of(selectedVehicle ? selectedVehicle : {});
-    return vehicle;
+  getVehicle(id: number): Observable<Vehicle> {
+    return this.http
+      .post<Vehicle>(this.GATEWAY + this.API + this.VEHICLE, id)
+      .pipe(catchError((err) => throwError(err)));
   }
 
   /**
    * Get a specific driver
    * @param id codeEmployee
    */
-  getDriver(id: number): Observable<any> {
-    // return this.http
-    //   .post<Driver[]>(this.GATEWAY + this.API + this.DRIVER, id)
-    //   .pipe(catchError((err) => throwError(err)));
-    const driver = of(this.drivers.find((dr) => dr.codigoEmpleado === id));
-    return driver;
+  getDriver(id: number): Observable<Driver> {
+    return this.http
+      .post<Driver>(this.GATEWAY + this.API + this.DRIVER, id)
+      .pipe(catchError((err) => throwError(err)));
   }
 }

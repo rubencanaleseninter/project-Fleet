@@ -2,26 +2,26 @@
   {
     "codigoEmpleado": 1,
     "nombreEmpleado": "Antonio",
-    "idVehiculo": 3
+    "idVehiculo":[3]
   },
   {
     "codigoEmpleado": 2,
     "nombreEmpleado": "Vicente",
-    "idVehiculo": 4
+    "idVehiculo": [4]
   },
   {
     "codigoEmpleado": 3,
     "nombreEmpleado": "Manuel",
-    "idVehiculo": 1
+    "idVehiculo": [1]
   },
   {
     "codigoEmpleado": 4,
     "nombreEmpleado": "Abdul",
-    "idVehiculo": 5
+    "idVehiculo": [5]
   },
   {
     "codigoEmpleado": 5,
     "nombreEmpleado": "Joan",
-    "idVehiculo": 2
+    "idVehiculo": [2]
   }
 ]
