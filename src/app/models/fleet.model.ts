@@ -1,21 +1,21 @@
 export class Vehicle {
   constructor(
-    private _id: number,
-    private _matricula: string,
-    private _bastidor: string,
-    private _modelo: number,
-    private _tipofinanciacion: number,
-    private _fechaalta: string,
-    private _idempresa: number,
-    private _kmactual: number,
-    private _idtipovehiculo: number,
-    private _IDtipoCombustible: number,
-    private _IDEmpresaFinanciacion: number,
-    private _NumeroContrato: number,
-    private _Kmmaximos: number,
-    private _Cuotamensual: number,
-    private _Activo: number,
-    private _Observaciones: string
+    private _id = 0,
+    private _matricula = '',
+    private _bastidor = '',
+    private _modelo = 0,
+    private _tipofinanciacion = 0,
+    private _fechaalta = '',
+    private _idempresa = 0,
+    private _kmactual = 0,
+    private _idtipovehiculo = 0,
+    private _IDtipoCombustible = 0,
+    private _IDEmpresaFinanciacion = 0,
+    private _NumeroContrato = 0,
+    private _Kmmaximos = 0,
+    private _Cuotamensual = 0,
+    private _Activo = 0,
+    private _Observaciones = ''
   ) {}
 
   get id(): number {
@@ -39,94 +39,94 @@ export class Vehicle {
     this._bastidor = value;
   }
 
-   get modelo(): number {
+  get modelo(): number {
     return this._modelo;
   }
-   set modelo(value: number) {
+  set modelo(value: number) {
     this._modelo = value;
   }
 
-   get tipofinanciacion(): number {
+  get tipofinanciacion(): number {
     return this._tipofinanciacion;
   }
-   set tipofinanciacion(value: number) {
+  set tipofinanciacion(value: number) {
     this._tipofinanciacion = value;
   }
 
-   get fechaalta(): string {
+  get fechaalta(): string {
     return this._fechaalta;
   }
-   set fechaalta(value: string) {
+  set fechaalta(value: string) {
     this._fechaalta = value;
   }
 
-   get idempresa(): number {
+  get idempresa(): number {
     return this._idempresa;
   }
-   set idempresa(value: number) {
+  set idempresa(value: number) {
     this._idempresa = value;
   }
 
-   get kmactual(): number {
+  get kmactual(): number {
     return this._kmactual;
   }
-   set kmactual(value: number) {
+  set kmactual(value: number) {
     this._kmactual = value;
   }
 
-   get idtipovehiculo(): number {
+  get idtipovehiculo(): number {
     return this._idtipovehiculo;
   }
-   set idtipovehiculo(value: number) {
+  set idtipovehiculo(value: number) {
     this._idtipovehiculo = value;
   }
 
-   get IDtipoCombustible(): number {
+  get IDtipoCombustible(): number {
     return this._IDtipoCombustible;
   }
-   set IDtipoCombustible(value: number) {
+  set IDtipoCombustible(value: number) {
     this._IDtipoCombustible = value;
   }
 
-   get IDEmpresaFinanciacion(): number {
+  get IDEmpresaFinanciacion(): number {
     return this._IDEmpresaFinanciacion;
   }
-   set IDEmpresaFinanciacion(value: number) {
+  set IDEmpresaFinanciacion(value: number) {
     this._IDEmpresaFinanciacion = value;
   }
 
-   get NumeroContrato(): number {
+  get NumeroContrato(): number {
     return this._NumeroContrato;
   }
-   set NumeroContrato(value: number) {
+  set NumeroContrato(value: number) {
     this._NumeroContrato = value;
   }
 
-   get Kmmaximos(): number {
+  get Kmmaximos(): number {
     return this._Kmmaximos;
   }
-   set Kmmaximos(value: number) {
+  set Kmmaximos(value: number) {
     this._Kmmaximos = value;
   }
 
-   get Cuotamensual(): number {
+  get Cuotamensual(): number {
     return this._Cuotamensual;
   }
-   set Cuotamensual(value: number) {
+  set Cuotamensual(value: number) {
     this._Cuotamensual = value;
   }
 
-   get Activo(): number {
+  get Activo(): number {
     return this._Activo;
   }
-   set Activo(value: number) {
+  set Activo(value: number) {
     this._Activo = value;
   }
 
-   get Observaciones(): string {
+  get Observaciones(): string {
     return this._Observaciones;
   }
-   set Observaciones(value: string) {
+  set Observaciones(value: string) {
     this._Observaciones = value;
   }
 }

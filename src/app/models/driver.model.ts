@@ -1,8 +1,8 @@
 export class Driver {
   constructor(
-    private _codigoEmpleado: number,
-    private _nombreEmpleado: string,
-    private _idVehiculo: number
+    private _codigoEmpleado = 0,
+    private _nombreEmpleado = '',
+    private _idVehiculo = 0
   ) {}
 
   get codigoEmpleado(): number {

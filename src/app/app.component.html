@@ -1,163 +1,211 @@
-<div class="w-100 h-100 p-4">
-  <!-- VEHICLES TABLE (PrimeNg) -->
-  <button class="btn btn-primary m-4" (click)="showAddVehicle($event)">
-    Añadir vehículo
-  </button>
-
-  <div class="p-4">
-    <h4 class="pb-2">Vehículos</h4>
-    <p-table
-      #vehicleTable
-      [value]="vehicles"
-      [columns]="vehicleCols"
-      [rows]="3"
-      [(selection)]="selectedVehicle"
-      (onRowSelect)="showEditVehicle(selectedVehicle)"
-      [rowHover]="true"
-      [showCurrentPageReport]="true"
-      [paginator]="true"
-      dataKey="id"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-    >
-      <ng-template pTemplate="caption">
-        <div class="row">
-          <div class="col-lg-5 col-md-12 col-sm-12">
-            <input
-              class="form-control"
-              type="search"
-              pInputText
-              placeholder="Buscar ..."
-              (input)="filterGlobal($event.target, vehicleTable)"
-            />
-          </div>
+<!-- VEHICLES TABLE -->
+<div *ngIf="vehicleCols" class="p-4">
+  <h4 class="pb-2">Vehículos</h4>
+  <p-table
+    #vehicleTable
+    [value]="vehicleArray"
+    [columns]="vehicleCols"
+    [rows]="10"
+    [(selection)]="apiService.selectedVehicle"
+    (onRowSelect)="showEditVehicle(apiService.selectedVehicle)"
+    [rowHover]="true"
+    [showCurrentPageReport]="true"
+    [paginator]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando {first} - {last} de {totalRecords} vehículos"
+  >
+    <ng-template pTemplate="caption">
+      <div class="row">
+        <div class="col-lg-5 col-md-12 col-sm-12">
+          <input
+            #searchVehicle
+            class="form-control"
+            type="search"
+            pInputText
+            placeholder="Buscar ..."
+            (input)="vehicleTable.filterGlobal(searchVehicle.value, 'contains')"
+          />
         </div>
-      </ng-template>
-
-      <ng-template pTemplate="header" let-columns>
-        <tr>
-          <th
-            *ngFor="let col of vehicleCols"
-            class="text-center"
-            [pSortableColumn]="col.field"
+        <div class="col">
+          <button
+            class="btn btn-primary"
+            (click)="this.displayAddVehicle = true"
           >
-            {{ col.header }}
-            <p-sortIcon
-              [field]="col.field"
-              ariaLabel="Activate to sort"
-              ariaLabelDesc="Activate to sort in descending order"
-              ariaLabelAsc="Activate to sort in ascending order"
-            ></p-sortIcon>
-          </th>
-          <th class="text-center"></th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-rowData let-columns="columns">
-        <tr [pSelectableRow]="rowData" (click)="showVehicleDetails(rowData)">
-          <td *ngFor="let col of columns" class="text-justify">
-            <span *ngIf="col.field === 'fechaalta'; else elseBlock">
-              {{ rowData[col.field] | date: "dd/MM/yyyy" }}
+            Añadir vehículo
+          </button>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header" let-columns>
+      <tr>
+        <th
+          *ngFor="let col of vehicleCols"
+          class="text-center"
+          [pSortableColumn]="col.field"
+        >
+          {{ col.header }}
+          <p-sortIcon
+            [field]="col.field"
+            ariaLabel="Activate to sort"
+            ariaLabelDesc="Activate to sort in descending order"
+            ariaLabelAsc="Activate to sort in ascending order"
+          ></p-sortIcon>
+        </th>
+        <th class="text-center"></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-rowData let-columns="columns">
+      <tr [pSelectableRow]="rowData" (click)="showVehicleDetails(rowData)">
+        <td *ngFor="let col of columns" class="text-justify">
+          <span *ngIf="col.field === 'fechaalta'; else elseBlock">
+            {{ rowData[col.field] | date: "dd/MM/yyyy" }}
+          </span>
+          <ng-template #elseBlock>
+            <span
+              [ngStyle]="{
+                'font-size': col.field === 'Observaciones' ? '0.9em' : ''
+              }"
+            >
+              {{ rowData[col.field] }}
             </span>
-            <ng-template #elseBlock>
-              <span
-                [ngStyle]="{
-                  'font-size': col.field === 'Observaciones' ? '0.9em' : ''
-                }"
-              >
-                {{ rowData[col.field] }}
-              </span>
-            </ng-template>
-          </td>
-          <td class="text-center">
-            <button
-              class="btn btn-outline-danger"
-              (click)="showEditVehicle(rowData); $event.stopPropagation()"
-            >
-              Editar
-            </button>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
-
-  <!-- DRIVERS TABLE (PrimeNg) -->
-  <button class="btn btn-primary m-4" (click)="showAddDriver($event)">
-    Añadir Conductor
-  </button>
-
-  <div class="p-4">
-    <h4 class="pb-2">Conductores</h4>
-    <p-table
-      #driverTable
-      [scrollable]="true"
-      [value]="drivers"
-      [columns]="driverCols"
-      [rows]="10"
-      [(selection)]="selectedDriver"
-      [rowHover]="true"
-      [showCurrentPageReport]="true"
-      dataKey="id"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-    >
-      <ng-template pTemplate="caption">
-        <div class="row">
-          <div class="col-lg-5 col-md-12 col-sm-12">
-            <input
-              class="form-control"
-              type="search"
-              pInputText
-              placeholder="Buscar ..."
-              (input)="filterGlobal($event.target, driverTable)"
-            />
-          </div>
-        </div>
-      </ng-template>
-
-      <ng-template pTemplate="header" let-columns>
-        <tr>
-          <th
-            *ngFor="let col of driverCols"
-            class="text-center"
-            [pSortableColumn]="col.field"
+          </ng-template>
+        </td>
+        <td class="text-center">
+          <button
+            class="btn btn-outline-danger"
+            (click)="showEditVehicle(rowData); $event.stopPropagation()"
           >
-            {{ col.header }}
-            <p-sortIcon
-              [field]="col.field"
-              ariaLabel="Activate to sort"
-              ariaLabelDesc="Activate to sort in descending order"
-              ariaLabelAsc="Activate to sort in ascending order"
-            ></p-sortIcon>
-          </th>
-          <th class="text-center"></th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-rowData let-columns="columns">
-        <tr [pSelectableRow]="rowData" (click)="showDriverDetails(rowData)">
-          <td *ngFor="let col of columns" class="text-center">
-            {{ rowData[col.field] }}
-          </td>
-          <td class="text-center">
-            <button
-              class="btn btn-outline-danger"
-              (click)="showEditDriver(rowData); $event.stopPropagation()"
-            >
-              Editar
-            </button>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
+            Editar
+          </button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage" let-columns>
+      <tr>
+        <td [attr.colspan]="columns.length">No se han obtenido resultados</td>
+      </tr>
+    </ng-template>
+  </p-table>
 </div>
 
-<!-- DRIVER DIALOGS -->
+<!-- DRIVERS TABLE -->
+<div *ngIf="driverCols" class="p-4">
+  <h4 class="pb-2">Conductores</h4>
+  <p-table
+    #driverTable
+    [value]="driverArray"
+    [columns]="driverCols"
+    [rows]="10"
+    [(selection)]="apiService.selectedDriver"
+    [rowHover]="true"
+    [showCurrentPageReport]="true"
+    [paginator]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando {first} - {last} de {totalRecords} vehículos"
+  >
+    <ng-template pTemplate="caption">
+      <div class="row">
+        <div class="col-lg-5 col-md-10 col-sm-10">
+          <input
+            #searchDriver
+            class="form-control"
+            type="search"
+            pInputText
+            placeholder="Buscar ..."
+            (input)="driverTable.filterGlobal(searchDriver.value, 'contains')"
+          />
+        </div>
+        <div class="col">
+          <button
+            class="btn btn-primary"
+            (click)="this.displayAddDriver = true"
+          >
+            Añadir Conductor
+          </button>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header" let-columns>
+      <tr>
+        <th
+          *ngFor="let col of driverCols"
+          class="text-center"
+          [pSortableColumn]="col.field"
+        >
+          {{ col.header }}
+          <p-sortIcon
+            [field]="col.field"
+            ariaLabel="Activate to sort"
+            ariaLabelDesc="Activate to sort in descending order"
+            ariaLabelAsc="Activate to sort in ascending order"
+          ></p-sortIcon>
+        </th>
+        <th class="text-center"></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-rowData let-columns="columns">
+      <tr [pSelectableRow]="rowData" (click)="showDriverDetails(rowData)">
+        <td *ngFor="let col of columns" class="text-center">
+          {{ rowData[col.field] }}
+        </td>
+        <td class="text-center">
+          <button
+            class="btn btn-outline-danger"
+            (click)="
+              showEditDriver(rowData);
+              $event.stopImmediatePropagation();
+              $event.preventDefault()
+            "
+          >
+            Editar
+          </button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage" let-columns>
+      <tr>
+        <td [attr.colspan]="columns.length">No se han obtenido resultados</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- NEW DRIVER DIALOG -->
 <p-dialog
+  *ngIf="displayAddDriver"
   header="Nuevo conductor"
-  [(visible)]="displayAddDriver"
   [style]="{ width: '50vw' }"
   [modal]="true"
+  [(visible)]="displayAddDriver"
+  (onHide)="formDriverGroup.reset(); formVehicleGroup.markAsUntouched()"
 >
-  Añadir conductor nuevo
+  <form [formGroup]="formDriverGroup" style="min-height: 400px">
+    <div *ngFor="let col of driverCols; let n = index">
+      <label [for]="col.field">{{ col.header }} </label>
+      <div class="col-5 mt-2 mb-4">
+        <input
+          *ngIf="col.type === 'input'"
+          class="form-control"
+          [class.invalid]="
+            this.formDriverGroup.controls[col.field].touched &&
+            this.formDriverGroup.controls[col.field].invalid
+          "
+          [class.valid]="this.formDriverGroup.controls[col.field].valid"
+          [formControlName]="col.field"
+          [formControlName]="col.field"
+          [name]="col.field"
+        />
+        <p-dropdown
+          *ngIf="col.type === 'select'"
+          optionLabel="name"
+          optionValue="value"
+          [options]="col.options"
+          [formControlName]="col.field"
+        ></p-dropdown>
+      </div>
+    </div>
+  </form>
   <ng-template pTemplate="footer">
     <button
       type="button"
@@ -168,21 +216,48 @@
     </button>
     <button
       type="button"
-      class="btn btn-success"
-      (click)="closeRequests(); displayAddDriver = false"
+      class="btn btn-primary"
+      [disabled]="formDriverGroup.invalid"
+      (click)="saveDriver(true)"
     >
       Guardar
     </button>
   </ng-template>
 </p-dialog>
 
+<!-- EDIT DRIVER DIALOG -->
 <p-dialog
   header="Editar conductor"
-  [(visible)]="displayEditDriver"
   [style]="{ width: '50vw' }"
   [modal]="true"
+  [(visible)]="displayEditDriver"
+  (onHide)="formDriverGroup.reset(); formVehicleGroup.markAsUntouched()"
 >
-  Editar conductor
+  <form [formGroup]="formDriverGroup" style="min-height: 400px">
+    <div *ngFor="let col of driverCols; let n = index">
+      <label [for]="col.field">{{ col.header }} </label>
+      <div class="col-5 mt-2 mb-4">
+        <input
+          *ngIf="col.type === 'input'"
+          class="form-control"
+          [class.invalid]="
+            this.formDriverGroup.controls[col.field].touched &&
+            this.formDriverGroup.controls[col.field].invalid
+          "
+          [class.valid]="this.formDriverGroup.controls[col.field].valid"
+          [formControlName]="col.field"
+          [name]="col.field"
+        />
+        <p-dropdown
+          *ngIf="col.type === 'select'"
+          optionLabel="name"
+          optionValue="value"
+          [options]="col.options"
+          [formControlName]="col.field"
+        ></p-dropdown>
+      </div>
+    </div>
+  </form>
   <ng-template pTemplate="footer">
     <button
       type="button"
@@ -194,13 +269,15 @@
     <button
       type="button"
       class="btn btn-primary"
-      (click)="closeRequests(); displayEditDriver = false"
+      [disabled]="formDriverGroup.invalid"
+      (click)="saveDriver()"
     >
       Guardar
     </button>
   </ng-template>
 </p-dialog>
 
+<!-- DRIVER DETAIL DIALOG -->
 <p-dialog
   header="Detalles del conductor"
   [(visible)]="displayDriverDetails"
@@ -209,18 +286,59 @@
   [closeOnEscape]="true"
   [style]="{ width: '50vw' }"
   [modal]="true"
+  (onHide)="formDriverGroup.reset(); formVehicleGroup.markAsUntouched()"
 >
-  Detalles del conductor
+  <div *ngFor="let item of apiService.selectedDriver | keyvalue">
+    <b>{{ item.key }}: </b>
+    <span>{{ item.value }}</span>
+  </div>
 </p-dialog>
 
-<!-- VEHICLE DIALOGS -->
+<!-- NEW VEHICLE DIALOG -->
 <p-dialog
   header="Nuevo vehículo"
   [(visible)]="displayAddVehicle"
   [style]="{ width: '50vw' }"
   [modal]="true"
+  (onHide)="formVehicleGroup.reset(); formVehicleGroup.markAsUntouched()"
 >
-  Añadir vehículo nuevo
+  <form [formGroup]="formVehicleGroup">
+    <div *ngFor="let col of vehicleCols; let n = index" class="row">
+      <label [for]="col.field" class="col-12">{{ col.header }} </label>
+      <div class="col-5 mt-2 mb-4">
+        <input
+          *ngIf="col.type === 'input'"
+          class="form-control"
+          [class.invalid]="
+            this.formVehicleGroup.controls[col.field].touched &&
+            this.formVehicleGroup.controls[col.field].invalid
+          "
+          [class.valid]="this.formVehicleGroup.controls[col.field].valid"
+          [formControlName]="col.field"
+          [formControlName]="col.field"
+          [name]="col.field"
+        />
+        <p-dropdown
+          *ngIf="col.type === 'select'"
+          optionLabel="name"
+          optionValue="value"
+          [options]="col.options"
+          [formControlName]="col.field"
+        ></p-dropdown>
+        <textarea
+          *ngIf="col.type === 'textarea'"
+          pInputTextarea
+          [rows]="3"
+          [cols]="50"
+          [formControlName]="col.field"
+        ></textarea>
+        <p-inputSwitch
+          *ngIf="col.type === 'checkbox'"
+          [formControlName]="col.field"
+        ></p-inputSwitch>
+      </div>
+    </div>
+  </form>
   <ng-template pTemplate="footer">
     <button
       type="button"
@@ -232,20 +350,59 @@
     <button
       type="button"
       class="btn btn-primary"
-      (click)="closeRequests(); displayAddVehicle = false"
+      [disabled]="formVehicleGroup.invalid"
+      (click)="saveVehicle(true)"
     >
       Guardar
     </button>
   </ng-template>
 </p-dialog>
 
+<!-- EDIT VEHICLE DIALOG -->
 <p-dialog
   header="Editar vehículo"
   [(visible)]="displayEditVehicle"
   [style]="{ width: '50vw' }"
   [modal]="true"
+  (onHide)="formVehicleGroup.reset(); formVehicleGroup.markAsUntouched()"
 >
-  Editar vehiculo
+  <form [formGroup]="formVehicleGroup">
+    <div *ngFor="let col of vehicleCols; let n = index">
+      <label [for]="col.field">{{ col.header }} </label>
+      <div class="col-5 mt-2 mb-4">
+        <input
+          *ngIf="col.type === 'input'"
+          class="form-control"
+          [class.invalid]="
+            this.formVehicleGroup.controls[col.field].touched &&
+            this.formVehicleGroup.controls[col.field].invalid
+          "
+          [class.valid]="this.formVehicleGroup.controls[col.field].valid"
+          [formControlName]="col.field"
+          [formControlName]="col.field"
+          [name]="col.field"
+        />
+        <p-dropdown
+          *ngIf="col.type === 'select'"
+          optionLabel="name"
+          optionValue="value"
+          [options]="col.options"
+          [formControlName]="col.field"
+        ></p-dropdown>
+        <textarea
+          *ngIf="col.type === 'textarea'"
+          pInputTextarea
+          [rows]="3"
+          [cols]="50"
+          [formControlName]="col.field"
+        ></textarea>
+        <p-inputSwitch
+          *ngIf="col.type === 'checkbox'"
+          [formControlName]="col.field"
+        ></p-inputSwitch>
+      </div>
+    </div>
+  </form>
   <ng-template pTemplate="footer">
     <button
       type="button"
@@ -257,19 +414,27 @@
     <button
       type="button"
       class="btn btn-primary"
-      (click)="closeRequests(); displayEditVehicle = false"
+      [disabled]="formVehicleGroup.invalid"
+      (click)="saveVehicle()"
     >
       Guardar
     </button>
   </ng-template>
 </p-dialog>
 
+<!-- VEHICLE DETAIL DIALOG -->
 <p-dialog
   header="Detalles del vehículo"
   [(visible)]="displayVehicleDetails"
   [dismissableMask]="true"
   [style]="{ width: '50vw' }"
   [modal]="true"
+  (onHide)="formVehicleGroup.reset(); formVehicleGroup.markAsUntouched()"
 >
-  Detalles del vehículo
+  <div *ngFor="let item of apiService.selectedVehicle | keyvalue">
+    <b>{{ item.key }}: </b>
+    <span>{{ item.value }}</span>
+  </div>
 </p-dialog>
+
+<p-toast></p-toast>

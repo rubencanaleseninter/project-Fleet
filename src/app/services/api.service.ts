@@ -92,9 +92,9 @@ export class ApiService {
   /**
    * Set selected driver
    */
-  SetSelectedDriver(Driver: Driver): void {
-    this.selectedDriver = Driver;
-    this.selectedDriver$.next(Driver);
+  SetSelectedDriver(driver: Driver): void {
+    this.selectedDriver = driver;
+    this.selectedDriver$.next(driver);
   }
 
   /* ===== API CALLS ===== */
@@ -108,9 +108,6 @@ export class ApiService {
     //   .get<Vehicle[]>(this.GATEWAY + this.API + this.ALL_VEHICLES)
     //   .pipe(catchError((err) => throwError(err)));
 
-    /** LOCAL MOCK */
-    // return of(this.vehicles).pipe(catchError((err) => throwError(err)));
-    
     /** LOCAL JSON */
     return this.http
       .get<Vehicle[]>('/assets/vehicles.json')
@@ -125,9 +122,6 @@ export class ApiService {
     // return this.http
     //   .get<Driver[]>(this.GATEWAY + this.API + this.ALL_DRIVERS)
     //   .pipe(catchError((err) => throwError(err)));
-
-    /** LOCAL MOCK */
-    // return of(this.drivers).pipe(catchError((err) => throwError(err)));
 
     /** LOCAL JSON */
     return this.http
