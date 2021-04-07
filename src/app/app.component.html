@@ -2,6 +2,7 @@
 <div *ngIf="vehicleCols" class="p-4">
   <h4 class="pb-2">Vehículos</h4>
   <p-table
+    *ngIf="vehicleArray; else tableTemplate"
     #vehicleTable
     [value]="vehicleArray"
     [columns]="vehicleCols"
@@ -11,12 +12,15 @@
     [rowHover]="true"
     [showCurrentPageReport]="true"
     [paginator]="true"
+    [globalFilterFields]="vehicleFilters"
+    [scrollable]="true"
+    [style]="{ width: '100%' }"
     dataKey="id"
     currentPageReportTemplate="Mostrando {first} - {last} de {totalRecords} vehículos"
   >
     <ng-template pTemplate="caption">
       <div class="row">
-        <div class="col-lg-5 col-md-12 col-sm-12">
+        <div class="col-lg-4 col-md-8 col-sm-12">
           <input
             #searchVehicle
             class="form-control"
@@ -26,12 +30,31 @@
             (input)="vehicleTable.filterGlobal(searchVehicle.value, 'contains')"
           />
         </div>
+
         <div class="col">
-          <button class="btn btn-primary" (click)="showAddVehicle()">
-            Añadir vehículo
-          </button>
+          <p-button
+            label=" Añadir vehículo"
+            (click)="showAddVehicle()"
+          ></p-button>
+          <button
+            type="button"
+            pButton
+            pRipple
+            class="p-button-success mx-4"
+            icon="pi pi-file-excel"
+            (click)="vehicleTable.exportCSV()"
+            pTooltip="Exportar tabla csv"
+            tooltipPosition="bottom"
+          ></button>
         </div>
       </div>
+    </ng-template>
+
+    <ng-template pTemplate="colgroup" let-columns>
+      <colgroup>
+        <col *ngFor="let col of vehicleCols" style="width: 100px" />
+        <col style="width: 140px" />
+      </colgroup>
     </ng-template>
 
     <ng-template pTemplate="header" let-columns>
@@ -48,15 +71,32 @@
             ariaLabelDesc="Activate to sort in descending order"
             ariaLabelAsc="Activate to sort in ascending order"
           ></p-sortIcon>
+          <p-columnFilter
+            type="text"
+            [field]="col.field"
+            display="menu"
+            [showMatchModes]="true"
+            [showAddButton]="false"
+            [showOperator]="false"
+          >
+            <ng-template pTemplate="header">
+              <h6 class="px-4 pt-3">{{ col.header }}</h6>
+            </ng-template>
+          </p-columnFilter>
         </th>
         <th class="text-center"></th>
       </tr>
     </ng-template>
+
     <ng-template pTemplate="body" let-rowData let-columns="columns">
       <tr [pSelectableRow]="rowData" (click)="showVehicleDetails(rowData)">
         <td *ngFor="let col of columns" class="text-justify">
-          <span *ngIf="col.field === 'fechaalta'; else elseBlock">
+          <span *ngIf="col.field === 'fechaalta'">
             {{ rowData[col.field] | date: "dd/MM/yyyy" }}
+          </span>
+
+          <span *ngIf="col.field === 'Activo'; else elseBlock">
+            {{ rowData[col.field] ? "Activo" : "Inactivo" }}
           </span>
           <ng-template #elseBlock>
             <span
@@ -70,14 +110,33 @@
         </td>
         <td class="text-center">
           <button
-            class="btn btn-outline-danger"
-            (click)="showEditVehicle(rowData); $event.stopPropagation()"
-          >
-            Editar
-          </button>
+            pButton
+            pRipple
+            type="button"
+            class="p-button-rounded p-button-outlined mx-2"
+            icon="pi pi-pencil"
+            pTooltip="Editar vehículo"
+            tooltipPosition="bottom"
+            (click)="
+              showEditVehicle(rowData);
+              $event.stopImmediatePropagation();
+              $event.preventDefault()
+            "
+          ></button>
+          <button
+            pButton
+            pRipple
+            type="button"
+            icon="pi pi-times"
+            class="p-button-rounded p-button-danger p-button-outlined mx-2"
+            pTooltip="Anular vehículo"
+            tooltipPosition="bottom"
+            (click)="removeVehicle(rowData); $event.stopPropagation()"
+          ></button>
         </td>
       </tr>
     </ng-template>
+
     <ng-template pTemplate="emptymessage" let-columns>
       <tr>
         <td [attr.colspan]="columns.length">No se han obtenido resultados</td>
@@ -90,6 +149,7 @@
 <div *ngIf="driverCols" class="p-4">
   <h4 class="pb-2">Conductores</h4>
   <p-table
+    *ngIf="driverArray; else tableTemplate"
     #driverTable
     [value]="driverArray"
     [columns]="driverCols"
@@ -100,10 +160,11 @@
     [paginator]="true"
     dataKey="id"
     currentPageReportTemplate="Mostrando {first} - {last} de {totalRecords} vehículos"
+    [globalFilterFields]="driverFilters"
   >
     <ng-template pTemplate="caption">
       <div class="row">
-        <div class="col-lg-5 col-md-10 col-sm-10">
+        <div class="col-lg-4 col-md-8 col-sm-10">
           <input
             #searchDriver
             class="form-control"
@@ -114,12 +175,25 @@
           />
         </div>
         <div class="col">
-          <button class="btn btn-primary" (click)="showAddDriver()">
-            Añadir Conductor
-          </button>
+          <p-button
+            label=" Añadir conductor"
+            (click)="showAddDriver()"
+          ></p-button>
+
+          <button
+            type="button"
+            pButton
+            pRipple
+            class="p-button-success mx-4"
+            icon="pi pi-file-excel"
+            (click)="driverTable.exportCSV()"
+            pTooltip="Exportar tabla csv"
+            tooltipPosition="bottom"
+          ></button>
         </div>
       </div>
     </ng-template>
+
     <ng-template pTemplate="header" let-columns>
       <tr>
         <th
@@ -134,10 +208,23 @@
             ariaLabelDesc="Activate to sort in descending order"
             ariaLabelAsc="Activate to sort in ascending order"
           ></p-sortIcon>
+          <p-columnFilter
+            type="text"
+            [field]="col.field"
+            display="menu"
+            [showMatchModes]="true"
+            [showAddButton]="false"
+            [showOperator]="false"
+          >
+            <ng-template pTemplate="header">
+              <h6 class="px-4 pt-3">{{ col.header }}</h6>
+            </ng-template>
+          </p-columnFilter>
         </th>
         <th class="text-center"></th>
       </tr>
     </ng-template>
+
     <ng-template pTemplate="body" let-rowData let-columns="columns">
       <tr [pSelectableRow]="rowData" (click)="showDriverDetails(rowData)">
         <td *ngFor="let col of columns" class="text-center">
@@ -145,18 +232,33 @@
         </td>
         <td class="text-center">
           <button
-            class="btn btn-outline-danger"
+            pButton
+            pRipple
+            type="button"
+            class="p-button-rounded p-button-outlined mx-2"
+            icon="pi pi-pencil"
+            pTooltip="Editar conductor"
+            tooltipPosition="bottom"
             (click)="
               showEditDriver(rowData);
               $event.stopImmediatePropagation();
               $event.preventDefault()
             "
-          >
-            Editar
-          </button>
+          ></button>
+          <button
+            pButton
+            pRipple
+            type="button"
+            icon="pi pi-times"
+            class="p-button-rounded p-button-danger p-button-outlined mx-2"
+            pTooltip="Anular conductor"
+            tooltipPosition="bottom"
+            (click)="removeDriver(rowData); $event.stopPropagation()"
+          ></button>
         </td>
       </tr>
     </ng-template>
+
     <ng-template pTemplate="emptymessage" let-columns>
       <tr>
         <td [attr.colspan]="columns.length">No se han obtenido resultados</td>
@@ -200,6 +302,7 @@
       </div>
     </div>
   </form>
+
   <ng-template pTemplate="footer">
     <button
       type="button"
@@ -252,6 +355,7 @@
       </div>
     </div>
   </form>
+
   <ng-template pTemplate="footer">
     <button
       type="button"
@@ -281,9 +385,11 @@
   [style]="{ width: '50vw' }"
   [modal]="true"
 >
-  <div *ngFor="let item of apiService.selectedDriver | keyvalue">
-    <b>{{ item.key }}: </b>
-    <span>{{ item.value }}</span>
+  <div *ngFor="let col of driverCols">
+    <b>{{ col.header }}: </b>
+    <span *ngIf="apiService.selectedDriver">{{
+      apiService.selectedDriver[col.field]
+    }}</span>
   </div>
 </p-dialog>
 
@@ -295,7 +401,7 @@
   [modal]="true"
 >
   <form [formGroup]="formVehicleGroup">
-    <div *ngFor="let col of vehicleCols; let n = index" class="row">
+    <div *ngFor="let col of vehicleCols" class="row">
       <label [for]="col.field" class="col-12">{{ col.header }} </label>
       <div class="col-5 mt-2 mb-4">
         <input
@@ -318,6 +424,7 @@
           [options]="col.options"
           [formControlName]="col.field"
         ></p-dropdown>
+
         <textarea
           *ngIf="col.type === 'textarea'"
           pInputTextarea
@@ -325,10 +432,12 @@
           [cols]="50"
           [formControlName]="col.field"
         ></textarea>
+
         <p-inputSwitch
           *ngIf="col.type === 'checkbox'"
           [formControlName]="col.field"
         ></p-inputSwitch>
+
         <p-calendar
           *ngIf="col.type === 'date'"
           [formControlName]="col.field"
@@ -340,6 +449,7 @@
       </div>
     </div>
   </form>
+
   <ng-template pTemplate="footer">
     <button
       type="button"
@@ -367,7 +477,7 @@
   [modal]="true"
 >
   <form [formGroup]="formVehicleGroup">
-    <div *ngFor="let col of vehicleCols; let n = index">
+    <div *ngFor="let col of vehicleCols">
       <label [for]="col.field">{{ col.header }} </label>
       <div class="col-5 mt-2 mb-4">
         <input
@@ -382,6 +492,7 @@
           [formControlName]="col.field"
           [name]="col.field"
         />
+
         <p-dropdown
           *ngIf="col.type === 'select'"
           optionLabel="name"
@@ -390,6 +501,7 @@
           [options]="col.options"
           [formControlName]="col.field"
         ></p-dropdown>
+
         <textarea
           *ngIf="col.type === 'textarea'"
           pInputTextarea
@@ -397,10 +509,12 @@
           [cols]="50"
           [formControlName]="col.field"
         ></textarea>
+
         <p-inputSwitch
           *ngIf="col.type === 'checkbox'"
           [formControlName]="col.field"
         ></p-inputSwitch>
+
         <p-calendar
           *ngIf="col.type === 'date'"
           [formControlName]="col.field"
@@ -412,6 +526,7 @@
       </div>
     </div>
   </form>
+
   <ng-template pTemplate="footer">
     <button
       type="button"
@@ -439,10 +554,36 @@
   [style]="{ width: '50vw' }"
   [modal]="true"
 >
-  <div *ngFor="let item of apiService.selectedVehicle | keyvalue">
-    <b>{{ item.key }}: </b>
-    <span>{{ item.value }}</span>
+  <div *ngFor="let col of vehicleCols">
+    <b>{{ col.header }}: </b>
+    <!-- <span *ngIf="apiService.selectedVehicle">{{
+      apiService.selectedVehicle[col.field]
+    }}</span> -->
+    <span *ngIf="apiService.selectedVehicle">
+      <span *ngIf="col.field != 'Activo'">
+        {{ apiService.selectedVehicle[col.field] }}
+      </span>
+      <span *ngIf="col.field === 'Activo'">
+        {{ apiService.selectedVehicle[col.field] ? "Activo" : "Inactivo" }}
+      </span>
+    </span>
   </div>
 </p-dialog>
 
 <p-toast></p-toast>
+
+<!-- LOADER -->
+<ng-template #tableTemplate>
+  <p-table [value]="[1, 2, 3, 4, 5]">
+    <ng-template pTemplate="header">
+      <tr>
+        <th *ngFor="let col of [1, 2, 3, 4]"></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-product>
+      <tr>
+        <td *ngFor="let col of [1, 2, 3, 4]"><p-skeleton></p-skeleton></td>
+      </tr>
+    </ng-template>
+  </p-table>
+</ng-template>

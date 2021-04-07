@@ -26,13 +26,15 @@ export class AppComponent implements OnInit {
   // Driver data
   driverArray!: Driver[];
   driverCols: any[] = [];
+  driverFilters!: string[];
   displayDriverDetails = false;
   displayAddDriver = false;
   displayEditDriver = false;
   // Vehicle data
   vehicleArray!: Vehicle[];
   vehicleCols!: Cols[];
-  vehicleIds: any[] = [{ name: 'No asignado', value: 0 }];
+  vehicleFilters!: string[];
+  vehicleIds: any[] = [{ name: 'No asignado', value: null }];
   displayVehicleDetails = false;
   displayAddVehicle = false;
   displayEditVehicle = false;
@@ -50,25 +52,38 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getData();
+    // TODO: Remove setTimeout, skeleton test
+    setTimeout(() => {
+      this.getData();
+    }, 1000);
     this.createCols();
+    this.createFilters();
     this.createVehicleForm();
     this.createDriverForm();
   }
 
+  /**
+   * Get the vehicles & drivers subscription data
+   */
   getData(): void {
     forkJoin([this.vehicles$, this.drivers$]).subscribe(
       ([vehicles, drivers]) => {
         this.vehicleArray = vehicles;
         this.driverArray = drivers;
-        // FIXME: On has API, remove this part
+        // TODO: On has API, remove this part
         vehicles.forEach((vh: Vehicle) => {
-          this.vehicleIds.push({ name: vh.id.toString(), value: vh.id });
+          this.vehicleIds.push({
+            name: vh.matricula.toString(),
+            value: vh.matricula,
+          });
         });
       }
     );
   }
 
+  /**
+   * Create the driver forms modal
+   */
   createDriverForm(): void {
     this.formDriverGroup = new FormGroup({});
     this.driverCols.forEach((col) =>
@@ -84,6 +99,9 @@ export class AppComponent implements OnInit {
     );
   }
 
+  /**
+   * Create the vehicle forms modal
+   */
   createVehicleForm(): void {
     this.formVehicleGroup = new FormGroup({});
     this.vehicleCols.forEach((col) => {
@@ -99,6 +117,9 @@ export class AppComponent implements OnInit {
     });
   }
 
+  /**
+   * Create the columns of the tables
+   */
   createCols(): void {
     this.vehicleCols = [
       {
@@ -251,7 +272,7 @@ export class AppComponent implements OnInit {
       },
       {
         field: 'idVehiculo',
-        header: 'Id vehículo',
+        header: 'Matrícula vehículo',
         type: 'select',
         disabled: false,
         required: false,
@@ -260,36 +281,70 @@ export class AppComponent implements OnInit {
     ];
   }
 
+  /**
+   * Create field filters
+   */
+  createFilters(): void {
+    this.driverFilters = this.driverCols.map((col) => col.field);
+    this.vehicleFilters = this.vehicleCols.map((col) => col.field);
+  }
+
+  /**
+   * Display driver detail modal
+   * @param rowData Driver
+   */
   showDriverDetails(rowData: Driver): void {
     this.apiService.selectedDriver = rowData;
     this.displayDriverDetails = true;
   }
 
+  /**
+   * Display edit driver modal
+   * @param rowData Driver
+   */
   showEditDriver(rowData: Driver): void {
     this.displayEditDriver = true;
     this.formDriverGroup.patchValue(rowData);
   }
 
+  /**
+   * Display vehicle detail modal
+   * @param rowData Vehicle
+   */
   showVehicleDetails(rowData: Vehicle): void {
     this.apiService.selectedVehicle = rowData;
     this.displayVehicleDetails = true;
   }
 
+  /**
+   * Display edit vehicle modal
+   * @param rowData Vehicle
+   */
   showEditVehicle(rowData: Vehicle): void {
     this.displayEditVehicle = true;
     this.formVehicleGroup.patchValue(rowData);
   }
 
+  /**
+   * Display add vehicle modal
+   */
   showAddVehicle(): void {
     this.formVehicleGroup.reset();
     this.displayAddVehicle = true;
   }
 
+  /**
+   * Display add driver modal
+   */
   showAddDriver(): void {
     this.formDriverGroup.reset();
     this.displayAddDriver = true;
   }
 
+  /**
+   * Save the driver form on edit or create new
+   * @param isNew boolean to know if editing or creating
+   */
   saveDriver(isNew: boolean = false): void {
     if (this.formDriverGroup.invalid) {
       this.displayMessage('error', 'Revise el formulario');
@@ -304,6 +359,10 @@ export class AppComponent implements OnInit {
     }
   }
 
+  /**
+   * Save the vehicle form on edit or create new
+   * @param isNew boolean to know if editing or creating
+   */
   saveVehicle(isNew: boolean = false): void {
     if (this.formVehicleGroup.invalid) {
       this.displayMessage('error', 'Revise el formulario');
@@ -318,25 +377,33 @@ export class AppComponent implements OnInit {
     }
   }
 
+  /**
+   * Remove the selected driver
+   * @param rowData Driver
+   */
   removeDriver(rowData: Driver): void {
-    if (rowData.idVehiculo) {
+    if (rowData.idVehiculo.length > 0) {
       this.displayMessage(
         'error',
-        'Este conductor tiene vehiculo asignado y no se ha podido eliminar'
+        'Este conductor tiene vehiculo asignado y no se puede eliminar'
       );
     } else {
-      // TODO: Call this.apiService.deleteDriver(rowData).subscribe(()=>{this.displayMessage('success', 'Conductor eliminado correctamente');});
+      // TODO: Call this.apiService.deleteDriver(rowData.id).subscribe(()=>{this.displayMessage('success', 'Conductor eliminado correctamente');});
     }
   }
 
+  /**
+   * Remove the selected vehicle
+   * @param rowData Vehicle
+   */
   removeVehicle(rowData: Vehicle): void {
-    if (rowData.id) {
+    if (rowData.Activo) {
       this.displayMessage(
         'error',
-        'Este vehiculo tiene conductor asignado y no se ha podido eliminar'
+        'Este vehiculo se encuentra activo y no se puede eliminar'
       );
     } else {
-      // TODO: Call this.apiService.deleteVehicle(vehicle).subscribe(()=>{this.displayMessage('success', 'Vehículo eliminado correctamente');});
+      // TODO: Call this.apiService.deleteVehicle(rowData.id).subscribe(()=>{this.displayMessage('success', 'Vehículo eliminado correctamente');});
     }
   }
 

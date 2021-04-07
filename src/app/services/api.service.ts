@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Subject, Observable, of, throwError } from 'rxjs';
+import { Subject, Observable, throwError } from 'rxjs';
 import { Driver } from '../models/driver.model';
 import { Vehicle } from '../models/fleet.model';
 import { catchError } from 'rxjs/operators';
@@ -21,7 +21,7 @@ export class ApiService {
   selectedVehicle: any;
   selectedDriver$ = new Subject<Driver>();
   selectedDriver: any;
-
+  // CALENDAR OPTIONS
   calendar = {
     es: {
       firstDayOfWeek: 1,
@@ -155,6 +155,47 @@ export class ApiService {
   getDriver(id: number): Observable<Driver> {
     return this.http
       .post<Driver>(this.GATEWAY + this.API + this.DRIVER, id)
+      .pipe(catchError((err) => throwError(err)));
+  }
+
+  /**
+   * Save a new or edited vehicle
+   * @param vehicle Vehicle
+   */
+  saveVehicle(vehicle: Vehicle): Observable<any> {
+    return this.http
+      .post<Vehicle>(this.GATEWAY + this.API + this.DRIVER, vehicle)
+
+      .pipe(catchError((err) => throwError(err)));
+  }
+
+  /**
+   * Save a new or edited driver
+   * @param driver Driver
+   */
+  saveDriver(driver: Driver): Observable<any> {
+    return this.http
+      .post<Driver>(this.GATEWAY + this.API + this.DRIVER, driver)
+      .pipe(catchError((err) => throwError(err)));
+  }
+
+  /**
+   * Delete the selected vehicle
+   * @param id string
+   */
+  deleteVehicle(id: string): Observable<any> {
+    return this.http
+      .post<string>(this.GATEWAY + this.API + this.DRIVER, id)
+      .pipe(catchError((err) => throwError(err)));
+  }
+
+  /**
+   * Delete the selected driver
+   * @param id string
+   */
+  deleteDriver(id: string): Observable<any> {
+    return this.http
+      .post<string>(this.GATEWAY + this.API + this.DRIVER, id)
       .pipe(catchError((err) => throwError(err)));
   }
 }

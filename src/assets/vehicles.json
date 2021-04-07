@@ -3,7 +3,7 @@
     "id": 1,
     "matricula": "3145BCD",
     "bastidor": "0g896dh",
-    "modelo": 3,
+    "modelo": "Volkswagen Polo 1.2",
     "tipofinanciacion": 1,
     "fechaalta": "",
     "idempresa": 1,
@@ -14,14 +14,14 @@
     "NumeroContrato": 8,
     "Kmmaximos": 12000,
     "Cuotamensual": 1250,
-    "Activo": 1,
+    "Activo": true,
     "Observaciones": "Al coche fantástico no le funciona el Aire"
   },
   {
     "id": 2,
     "matricula": "2940KLM",
     "bastidor": "3cvb46n76m",
-    "modelo": 3,
+    "modelo": "Renault Kangoo 1.2",
     "tipofinanciacion": 1,
     "fechaalta": "",
     "idempresa": 1,
@@ -32,14 +32,14 @@
     "NumeroContrato": 127,
     "Kmmaximos": 8000,
     "Cuotamensual": 600,
-    "Activo": 1,
+    "Activo": true,
     "Observaciones": "Le falta una limpieza"
   },
   {
     "id": 3,
     "matricula": "4021HRM",
     "bastidor": "b344n5",
-    "modelo": 3,
+    "modelo": "Toyota Yaris 1.3",
     "tipofinanciacion": 1,
     "fechaalta": "",
     "idempresa": 1,
@@ -50,14 +50,14 @@
     "NumeroContrato": 84,
     "Kmmaximos": 9000,
     "Cuotamensual": 500,
-    "Activo": 1,
+    "Activo": true,
     "Observaciones": "No tiene retrovisor derecho"
   },
   {
     "id": 4,
     "matricula": "3998JRT",
     "bastidor": "uhjmj45ufds",
-    "modelo": 3,
+    "modelo": "Ford Tourneo Courier 1.0",
     "tipofinanciacion": 1,
     "fechaalta": "",
     "idempresa": 1,
@@ -68,14 +68,14 @@
     "NumeroContrato": 21,
     "Kmmaximos": 2000,
     "Cuotamensual": 1250,
-    "Activo": 1,
+    "Activo": true,
     "Observaciones": "Ha perdido un tapacubos"
   },
   {
     "id": 5,
     "matricula": "5964FVY",
     "bastidor": "awerhbx",
-    "modelo": 3,
+    "modelo": "Volkswagen Golf 1.6 tdi",
     "tipofinanciacion": 1,
     "fechaalta": "",
     "idempresa": 1,
@@ -86,7 +86,7 @@
     "NumeroContrato": 33,
     "Kmmaximos": 6000,
     "Cuotamensual": 900,
-    "Activo": 0,
+    "Activo": false,
     "Observaciones": "La ventanilla no baja"
   }
 ]

@@ -2,26 +2,31 @@
   {
     "codigoEmpleado": 1,
     "nombreEmpleado": "Antonio",
-    "idVehiculo":[3]
+    "idVehiculo":["5964FVY"]
   },
   {
     "codigoEmpleado": 2,
     "nombreEmpleado": "Vicente",
-    "idVehiculo": [4]
+    "idVehiculo": ["3998JRT"]
   },
   {
     "codigoEmpleado": 3,
     "nombreEmpleado": "Manuel",
-    "idVehiculo": [1]
+    "idVehiculo": ["4021HRM"]
   },
   {
     "codigoEmpleado": 4,
     "nombreEmpleado": "Abdul",
-    "idVehiculo": [5]
+    "idVehiculo": ["2940KLM"]
   },
   {
     "codigoEmpleado": 5,
     "nombreEmpleado": "Joan",
-    "idVehiculo": [2]
+    "idVehiculo": ["3145BCD"]
+  },
+  {
+    "codigoEmpleado": 6,
+    "nombreEmpleado": "Oriol",
+    "idVehiculo": []
   }
 ]

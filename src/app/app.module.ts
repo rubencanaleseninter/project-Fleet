@@ -17,8 +17,11 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputSwitchModule } from 'primeng/inputswitch';
-import {CalendarModule} from 'primeng/calendar';
-import {MultiSelectModule} from 'primeng/multiselect';
+import { CalendarModule } from 'primeng/calendar';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { FilterService } from 'primeng/api';
+import { TooltipModule } from 'primeng/tooltip';
+import {SkeletonModule} from 'primeng/skeleton';
 
 @NgModule({
   declarations: [AppComponent],
@@ -39,9 +42,11 @@ import {MultiSelectModule} from 'primeng/multiselect';
     InputTextareaModule,
     InputSwitchModule,
     CalendarModule,
-    MultiSelectModule
+    MultiSelectModule,
+    TooltipModule,
+    SkeletonModule
   ],
-  providers: [ApiService, MessageService],
+  providers: [ApiService, MessageService, FilterService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

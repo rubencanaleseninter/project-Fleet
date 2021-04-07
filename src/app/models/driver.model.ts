@@ -2,7 +2,7 @@ export class Driver {
   constructor(
     private _codigoEmpleado: number = 0,
     private _nombreEmpleado: string = '',
-    private _idVehiculo: number[] = [0]
+    private _idVehiculo: string[] = ['']
   ) {}
 
   get codigoEmpleado(): number {
@@ -19,10 +19,10 @@ export class Driver {
     this._nombreEmpleado = value;
   }
 
-  get idVehiculo(): number[] {
+  get idVehiculo(): string[] {
     return this._idVehiculo;
   }
-  set idVehiculo(value: number[]) {
+  set idVehiculo(value: string[]) {
     this._idVehiculo = value;
   }
 }

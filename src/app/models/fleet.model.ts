@@ -3,7 +3,7 @@ export class Vehicle {
     private _id = 0,
     private _matricula = '',
     private _bastidor = '',
-    private _modelo = 0,
+    private _modelo = '',
     private _tipofinanciacion = 0,
     private _fechaalta = '',
     private _idempresa = 0,
@@ -14,7 +14,7 @@ export class Vehicle {
     private _NumeroContrato = 0,
     private _Kmmaximos = 0,
     private _Cuotamensual = 0,
-    private _Activo = 0,
+    private _Activo = true,
     private _Observaciones = ''
   ) {}
 
@@ -39,10 +39,10 @@ export class Vehicle {
     this._bastidor = value;
   }
 
-  get modelo(): number {
+  get modelo(): string {
     return this._modelo;
   }
-  set modelo(value: number) {
+  set modelo(value: string) {
     this._modelo = value;
   }
 
@@ -116,10 +116,10 @@ export class Vehicle {
     this._Cuotamensual = value;
   }
 
-  get Activo(): number {
+  get Activo(): boolean {
     return this._Activo;
   }
-  set Activo(value: number) {
+  set Activo(value: boolean) {
     this._Activo = value;
   }
 

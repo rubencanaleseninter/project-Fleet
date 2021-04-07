@@ -2,7 +2,7 @@ export interface Vehicle {
   id: number;
   matricula: string;
   bastidor: string;
-  modelo: number;
+  modelo: string;
   tipofinanciacion: number;
   fechaalta: Date;
   idempresa: number;
