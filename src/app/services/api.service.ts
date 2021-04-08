@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Subject, Observable, throwError } from 'rxjs';
+import { Subject, Observable, throwError, of } from 'rxjs';
 import { Driver } from '../models/driver.model';
 import { Vehicle } from '../models/fleet.model';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +16,13 @@ export class ApiService {
   private ALL_VEHICLES = '/all-vehicles';
   private DRIVER = '/driver';
   private VEHICLE = '/vehicle';
+  private FINANCING_TYPES = '/financing_types';
+  private COMBUSTIBLE_TYPES = '/combustible_types';
+  private VEHICLE_TYPES = '/vehicle_types';
+  private VEHICLE_MODELS = '/vehicle_models';
+  private FINANCING_COMPANIES = '/financing_companies';
+  private MANUFACTURERS = '/manufacturers';
+  private TRANSMISSION_TYPES = '/transmission_types';
   // DATA
   selectedVehicle$ = new Subject<Vehicle>();
   selectedVehicle: any;
@@ -159,13 +166,134 @@ export class ApiService {
   }
 
   /**
+   * Get vehicle ids
+   */
+  getVehicleIds(): Observable<any[]> {
+    return this.http.get<any[]>('/assets/vehicles.json').pipe(
+      map((res: any[]) => {
+        const vehicleIds: any[] = [];
+        res.forEach((vh: any) => {
+          vehicleIds.push({
+            name: vh.matricula.toString(),
+            value: vh.matricula,
+          });
+        });
+        return vehicleIds;
+      }),
+      catchError((err) => throwError(err))
+    );
+  }
+
+  /**
+   * Get vehicle financing options
+   */
+  getFinancingTypes(): Observable<any[]> {
+    // return this.http
+    //   .get<any[]>(this.GATEWAY + this.API + this.FINANCING_TYPES)
+    //   .pipe(catchError((err) => throwError(err)));
+    return of([
+      { name: 'No asignado', value: 0 },
+      { name: 'Renting - 48 Meses', value: 1 },
+    ]);
+  }
+
+  /**
+   * Get vehicle financing companies
+   */
+  getFinancingCompanies(): Observable<any[]> {
+    // return this.http
+    //   .get<any[]>(this.GATEWAY + this.API + this.FINANCING_COMPANIES)
+    //   .pipe(catchError((err) => throwError(err)));
+    return of([
+      { name: 'No asignado', value: 0 },
+      { name: 'Alphabet', value: 1 },
+      { name: 'Cooltra Motos SLU', value: 2 },
+    ]);
+  }
+
+  /**
+   * Get vehicle options
+   */
+  getVehicleTypes(): Observable<any[]> {
+    // return this.http
+    //   .get<any[]>(this.GATEWAY + this.API + this.VEHICLE_TYPES)
+    //   .pipe(catchError((err) => throwError(err)));
+    return of([
+      { name: 'No asignado', value: 0 },
+      { name: 'Turismo', value: 1 },
+      { name: 'Motocicleta', value: 2 },
+      { name: 'Furgoneta', value: 3 },
+      { name: 'Vehículo 3 ruedas', value: 4 },
+    ]);
+  }
+
+  /**
+   * Get vehicle models
+   */
+  getVehicleModels(): Observable<any[]> {
+    // return this.http
+    //   .get<any[]>(this.GATEWAY + this.API + this.VEHICLE_MODELS)
+    //   .pipe(catchError((err) => throwError(err)));
+    return of([
+      { name: 'No asignado', value: 0 },
+      { name: 'Gold', value: 1 },
+      { name: 'Polo', value: 2 },
+      { name: 'Kangoo', value: 3 },
+      { name: 'Tricity 125 ABS', value: 4 },
+    ]);
+  }
+
+  /**
+   * Get vehicle combustible options
+   */
+  getCombustibleTypes(): Observable<any[]> {
+    // return this.http
+    //   .get<any[]>(this.GATEWAY + this.API + this.COMBUSTIBLE_TYPES)
+    //   .pipe(catchError((err) => throwError(err)));
+    return of([
+      { name: 'No asignado', value: 0 },
+      { name: 'Gasolina', value: 1 },
+      { name: 'Diesel', value: 2 },
+      { name: 'Híbrido', value: 3 },
+      { name: 'Eléctrico', value: 4 },
+    ]);
+  }
+
+  /**
+   * Get vehicle manufacturers
+   */
+  getManufacturers(): Observable<any[]> {
+    // return this.http
+    //   .get<any[]>(this.GATEWAY + this.API + this.MANUFACTURERS)
+    //   .pipe(catchError((err) => throwError(err)));
+    return of([
+      { name: 'No asignado', value: 0 },
+      { name: 'Volkswagen', value: 1 },
+      { name: 'Renault', value: 2 },
+      { name: 'Yamaha', value: 3 },
+    ]);
+  }
+
+  /**
+   * Get vehicle transmission options
+   */
+  getTransmissionTypes(): Observable<any[]> {
+    // return this.http
+    //   .get<any[]>(this.GATEWAY + this.API + this.TRANSMISSION_TYPES)
+    //   .pipe(catchError((err) => throwError(err)));
+    return of([
+      { name: 'No asignado', value: 0 },
+      { name: 'Manual', value: 1 },
+      { name: 'Automática', value: 2 },
+    ]);
+  }
+  /**
    * Save a new or edited vehicle
    * @param vehicle Vehicle
    */
   saveVehicle(vehicle: Vehicle): Observable<any> {
     return this.http
       .post<Vehicle>(this.GATEWAY + this.API + this.DRIVER, vehicle)
-
       .pipe(catchError((err) => throwError(err)));
   }
 

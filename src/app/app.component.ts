@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { Driver } from './models/driver.model';
 import { Vehicle } from './models/fleet.model';
 import { ApiService } from './services/api.service';
@@ -13,6 +13,7 @@ export interface Cols {
   required: boolean;
   disabled: boolean;
   options?: any;
+  width?: string;
 }
 @Component({
   selector: 'app-root',
@@ -20,63 +21,78 @@ export interface Cols {
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  // Observables
-  drivers$: Observable<any>;
-  vehicles$: Observable<any>;
   // Driver data
   driverArray!: Driver[];
-  driverCols: any[] = [];
+  driverCols!: any[];
   driverFilters!: string[];
   displayDriverDetails = false;
-  displayAddDriver = false;
-  displayEditDriver = false;
+  displayFormDriverModal = false;
   // Vehicle data
   vehicleArray!: Vehicle[];
   vehicleCols!: Cols[];
   vehicleFilters!: string[];
-  vehicleIds: any[] = [{ name: 'No asignado', value: null }];
   displayVehicleDetails = false;
-  displayAddVehicle = false;
-  displayEditVehicle = false;
+  displayFormVehicleModal = false;
   // Forms
-  formVehicleGroup!: FormGroup;
-  formDriverGroup!: FormGroup;
+  formVehicleGroup = new FormGroup({});
+  formDriverGroup = new FormGroup({});
 
   constructor(
     public apiService: ApiService,
     private fb: FormBuilder,
     private messageService: MessageService
-  ) {
-    this.vehicles$ = this.apiService.getAllVehicles();
-    this.drivers$ = this.apiService.getAllDrivers();
-  }
+  ) {}
 
   ngOnInit(): void {
     // TODO: Remove setTimeout, skeleton test
     setTimeout(() => {
       this.getData();
     }, 1000);
-    this.createCols();
-    this.createFilters();
-    this.createVehicleForm();
-    this.createDriverForm();
   }
 
   /**
    * Get the vehicles & drivers subscription data
    */
   getData(): void {
-    forkJoin([this.vehicles$, this.drivers$]).subscribe(
-      ([vehicles, drivers]) => {
+    const vehicles$ = this.apiService.getAllVehicles();
+    const drivers$ = this.apiService.getAllDrivers();
+    const vehicleIds$ = this.apiService.getVehicleIds();
+    const financingTypes$ = this.apiService.getFinancingTypes();
+    const vehicleTypes$ = this.apiService.getVehicleTypes();
+    const combustibleTypes$ = this.apiService.getCombustibleTypes();
+    const transmissionTypes$ = this.apiService.getTransmissionTypes();
+
+    forkJoin([
+      vehicles$,
+      drivers$,
+      vehicleIds$,
+      financingTypes$,
+      vehicleTypes$,
+      combustibleTypes$,
+      transmissionTypes$
+    ]).subscribe(
+      ([
+        vehicles,
+        drivers,
+        vehicleIds,
+        financingTypes,
+        vehicleTypes,
+        combustibleTypes,
+        transmissionTypes
+      ]) => {
         this.vehicleArray = vehicles;
         this.driverArray = drivers;
-        // TODO: On has API, remove this part
-        vehicles.forEach((vh: Vehicle) => {
-          this.vehicleIds.push({
-            name: vh.matricula.toString(),
-            value: vh.matricula,
-          });
-        });
+
+        this.createColums(
+          vehicleIds,
+          financingTypes,
+          vehicleTypes,
+          combustibleTypes,
+          transmissionTypes
+        );
+        this.createFilters();
+        this.createVehicleForm();
+        this.createDriverForm();
       }
     );
   }
@@ -120,7 +136,13 @@ export class AppComponent implements OnInit {
   /**
    * Create the columns of the tables
    */
-  createCols(): void {
+  createColums(
+    vehicleIds: any[],
+    financingTypes: any[],
+    vehicleTypes: any[],
+    combustibleTypes: any[],
+    transmissionTypes: any []
+  ): void {
     this.vehicleCols = [
       {
         field: 'id',
@@ -128,6 +150,7 @@ export class AppComponent implements OnInit {
         type: 'input',
         disabled: true,
         required: false,
+        width: '80px',
       },
       {
         field: 'matricula',
@@ -135,6 +158,7 @@ export class AppComponent implements OnInit {
         type: 'input',
         disabled: false,
         required: true,
+        width: '100px',
       },
       {
         field: 'bastidor',
@@ -142,6 +166,7 @@ export class AppComponent implements OnInit {
         type: 'input',
         disabled: false,
         required: true,
+        width: '120px',
       },
       {
         field: 'modelo',
@@ -149,6 +174,7 @@ export class AppComponent implements OnInit {
         type: 'input',
         disabled: false,
         required: true,
+        width: '220px',
       },
       {
         field: 'tipofinanciacion',
@@ -156,12 +182,8 @@ export class AppComponent implements OnInit {
         type: 'select',
         disabled: false,
         required: true,
-        options: [
-          { name: 'No asignado', value: 0 },
-          { name: 'banco', value: 1 },
-          { name: 'renting', value: 2 },
-          { name: 'leasing', value: 3 },
-        ],
+        options: financingTypes,
+        width: '100px',
       },
       {
         field: 'fechaalta',
@@ -169,6 +191,15 @@ export class AppComponent implements OnInit {
         type: 'date',
         disabled: false,
         required: true,
+        width: '120px',
+      },
+      {
+        field: 'IDempleado',
+        header: 'Id Conductor',
+        type: 'input',
+        disabled: false,
+        required: false,
+        width: '100px',
       },
       {
         field: 'idempresa',
@@ -176,6 +207,7 @@ export class AppComponent implements OnInit {
         type: 'input',
         disabled: false,
         required: true,
+        width: '100px',
       },
       {
         field: 'kmactual',
@@ -183,6 +215,7 @@ export class AppComponent implements OnInit {
         type: 'input',
         disabled: false,
         required: true,
+        width: '100px',
       },
       {
         field: 'idtipovehiculo',
@@ -190,12 +223,8 @@ export class AppComponent implements OnInit {
         type: 'select',
         disabled: false,
         required: true,
-        options: [
-          { name: 'No asignado', value: 0 },
-          { name: 'turismo', value: 1 },
-          { name: 'comercial', value: 2 },
-          { name: 'motocicleta', value: 3 },
-        ],
+        options: vehicleTypes,
+        width: '100px',
       },
       {
         field: 'IDtipoCombustible',
@@ -203,13 +232,25 @@ export class AppComponent implements OnInit {
         type: 'select',
         disabled: false,
         required: true,
-        options: [
-          { name: 'No asignado', value: 0 },
-          { name: 'gasolina', value: 1 },
-          { name: 'diesel', value: 2 },
-          { name: 'híbrido', value: 3 },
-          { name: 'eléctrico', value: 4 },
-        ],
+        options: combustibleTypes,
+        width: '100px',
+      },
+      {
+        field: 'emisiones',
+        header: 'Emisiones',
+        type: 'input',
+        disabled: false,
+        required: true,
+        width: '100px',
+      },
+      {
+        field: 'IDtipoTransmision',
+        header: 'Tipo de transmisión',
+        type: 'select',
+        disabled: false,
+        required: true,
+        options: transmissionTypes,
+        width: '100px',
       },
       {
         field: 'IDEmpresaFinanciacion',
@@ -217,6 +258,7 @@ export class AppComponent implements OnInit {
         type: 'input',
         disabled: false,
         required: true,
+        width: '100px',
       },
       {
         field: 'NumeroContrato',
@@ -224,6 +266,7 @@ export class AppComponent implements OnInit {
         type: 'input',
         disabled: false,
         required: true,
+        width: '100px',
       },
       {
         field: 'Kmmaximos',
@@ -231,6 +274,7 @@ export class AppComponent implements OnInit {
         type: 'input',
         disabled: false,
         required: true,
+        width: '100px',
       },
       {
         field: 'Cuotamensual',
@@ -238,6 +282,7 @@ export class AppComponent implements OnInit {
         type: 'input',
         disabled: false,
         required: true,
+        width: '100px',
       },
       {
         field: 'Activo',
@@ -245,6 +290,7 @@ export class AppComponent implements OnInit {
         type: 'checkbox',
         disabled: false,
         required: true,
+        width: '80px',
       },
       {
         field: 'Observaciones',
@@ -252,6 +298,7 @@ export class AppComponent implements OnInit {
         type: 'textarea',
         disabled: false,
         required: false,
+        width: '200px',
       },
     ];
 
@@ -276,7 +323,7 @@ export class AppComponent implements OnInit {
         type: 'select',
         disabled: false,
         required: false,
-        options: this.vehicleIds,
+        options: vehicleIds,
       },
     ];
   }
@@ -290,120 +337,109 @@ export class AppComponent implements OnInit {
   }
 
   /**
-   * Display driver detail modal
-   * @param rowData Driver
+   * Display detail modal
+   * @param rowData Vehicle or Driver
    */
-  showDriverDetails(rowData: Driver): void {
-    this.apiService.selectedDriver = rowData;
-    this.displayDriverDetails = true;
+  showDetailModal(rowData: any, type: string): void {
+    if (type === 'driver') {
+      this.apiService.selectedDriver = rowData;
+      this.displayDriverDetails = true;
+      return;
+    }
+    if (type === 'vehicle') {
+      this.apiService.selectedVehicle = rowData;
+      this.displayVehicleDetails = true;
+    }
   }
 
   /**
-   * Display edit driver modal
-   * @param rowData Driver
+   * Display edit modal
+   * @param rowData Vehicle or Driver
    */
-  showEditDriver(rowData: Driver): void {
-    this.displayEditDriver = true;
-    this.formDriverGroup.patchValue(rowData);
+  showEditModal(rowData: any, type: string): void {
+    if (type === 'driver') {
+      this.displayFormDriverModal = true;
+      this.formDriverGroup.patchValue(rowData);
+      return;
+    }
+    if (type === 'vehicle') {
+      this.displayFormVehicleModal = true;
+      this.formVehicleGroup.patchValue(rowData);
+    }
   }
 
   /**
-   * Display vehicle detail modal
-   * @param rowData Vehicle
+   * Display add modal
    */
-  showVehicleDetails(rowData: Vehicle): void {
-    this.apiService.selectedVehicle = rowData;
-    this.displayVehicleDetails = true;
-  }
-
-  /**
-   * Display edit vehicle modal
-   * @param rowData Vehicle
-   */
-  showEditVehicle(rowData: Vehicle): void {
-    this.displayEditVehicle = true;
-    this.formVehicleGroup.patchValue(rowData);
-  }
-
-  /**
-   * Display add vehicle modal
-   */
-  showAddVehicle(): void {
-    this.formVehicleGroup.reset();
-    this.displayAddVehicle = true;
-  }
-
-  /**
-   * Display add driver modal
-   */
-  showAddDriver(): void {
+  showAddModal(type: string): void {
     this.formDriverGroup.reset();
-    this.displayAddDriver = true;
+    this.formVehicleGroup.reset();
+    type === 'driver'
+      ? (this.displayFormDriverModal = true)
+      : (this.displayFormVehicleModal = true);
   }
 
   /**
-   * Save the driver form on edit or create new
-   * @param isNew boolean to know if editing or creating
+   * Save form data on edit or create new
+   * @param type 'driver' or 'vehicle'
    */
-  saveDriver(isNew: boolean = false): void {
-    if (this.formDriverGroup.invalid) {
-      this.displayMessage('error', 'Revise el formulario');
-    } else {
-      let driver = new Driver();
-      driver = this.formDriverGroup.value;
-      // TODO: Call this.apiService.saveDriver(driver).subscribe(()=>{this.displayEditDriver = false;this.displayMessage('success', 'Conductor guardado correctamente');});
-      isNew
-        ? (this.displayAddDriver = false)
-        : (this.displayEditDriver = false);
-      this.displayMessage('success', 'Conductor guardado correctamente');
+  saveData(type: string): void {
+    let data;
+    if (type === 'driver') {
+      if (this.formDriverGroup.invalid) {
+        this.displayMessage('error', 'Revise el formulario');
+      } else {
+        data = new Driver(this.formDriverGroup.value);
+        this.apiService.saveDriver(data).subscribe(() => {
+          this.displayFormDriverModal = false;
+          this.displayMessage('success', 'Conductor guardado correctamente');
+        });
+      }
+      return;
+    }
+    if (type === 'vehicle') {
+      if (this.formVehicleGroup.invalid) {
+        this.displayMessage('error', 'Revise el formulario');
+      } else {
+        data = new Vehicle(this.formVehicleGroup.value);
+        this.apiService.saveVehicle(data).subscribe(() => {
+          this.displayFormVehicleModal = false;
+          this.displayMessage('success', 'Vehículo guardado correctamente');
+        });
+      }
     }
   }
 
   /**
-   * Save the vehicle form on edit or create new
-   * @param isNew boolean to know if editing or creating
+   * Delete the selected row
+   * @param rowData Driver | Vehicle
+   * @param type 'driver' or 'vehicle'
    */
-  saveVehicle(isNew: boolean = false): void {
-    if (this.formVehicleGroup.invalid) {
-      this.displayMessage('error', 'Revise el formulario');
-    } else {
-      let vehicle = new Vehicle(this.formVehicleGroup.value);
-      vehicle = this.formVehicleGroup.value;
-      // TODO: Call this.apiService.saveVehicle(vehicle).subscribe(()=>{this.displayEditVehicle = false;this.displayMessage('success', 'Vehículo guardado correctamente');});
-      isNew
-        ? (this.displayAddVehicle = false)
-        : (this.displayEditVehicle = false);
-      this.displayMessage('success', 'Vehículo guardado correctamente');
+  deleteRowData(rowData: any, type: string): void {
+    if (type === 'driver') {
+      if (rowData.idVehiculo.length > 0) {
+        this.displayMessage(
+          'error',
+          'Este conductor tiene vehiculo asignado y no se puede eliminar'
+        );
+      } else {
+        this.apiService.deleteDriver(rowData.id).subscribe(() => {
+          this.displayMessage('success', 'Conductor eliminado correctamente');
+        });
+      }
+      return;
     }
-  }
-
-  /**
-   * Remove the selected driver
-   * @param rowData Driver
-   */
-  removeDriver(rowData: Driver): void {
-    if (rowData.idVehiculo.length > 0) {
-      this.displayMessage(
-        'error',
-        'Este conductor tiene vehiculo asignado y no se puede eliminar'
-      );
-    } else {
-      // TODO: Call this.apiService.deleteDriver(rowData.id).subscribe(()=>{this.displayMessage('success', 'Conductor eliminado correctamente');});
-    }
-  }
-
-  /**
-   * Remove the selected vehicle
-   * @param rowData Vehicle
-   */
-  removeVehicle(rowData: Vehicle): void {
-    if (rowData.Activo) {
-      this.displayMessage(
-        'error',
-        'Este vehiculo se encuentra activo y no se puede eliminar'
-      );
-    } else {
-      // TODO: Call this.apiService.deleteVehicle(rowData.id).subscribe(()=>{this.displayMessage('success', 'Vehículo eliminado correctamente');});
+    if (type === 'vehicle') {
+      if (rowData.Activo) {
+        this.displayMessage(
+          'error',
+          'Este vehiculo se encuentra activo y no se puede eliminar'
+        );
+      } else {
+        this.apiService.deleteVehicle(rowData.id).subscribe(() => {
+          this.displayMessage('success', 'Vehículo eliminado correctamente');
+        });
+      }
     }
   }
 

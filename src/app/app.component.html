@@ -1,14 +1,14 @@
 <!-- VEHICLES TABLE -->
-<div *ngIf="vehicleCols" class="p-4">
+<div class="p-4">
   <h4 class="pb-2">Vehículos</h4>
   <p-table
-    *ngIf="vehicleArray; else tableTemplate"
+    *ngIf="vehicleArray; else vhTemplate"
     #vehicleTable
     [value]="vehicleArray"
     [columns]="vehicleCols"
     [rows]="10"
     [(selection)]="apiService.selectedVehicle"
-    (onRowSelect)="showEditVehicle(apiService.selectedVehicle)"
+    (onRowSelect)="showEditModal(apiService.selectedVehicle, 'vehicle')"
     [rowHover]="true"
     [showCurrentPageReport]="true"
     [paginator]="true"
@@ -34,7 +34,7 @@
         <div class="col">
           <p-button
             label=" Añadir vehículo"
-            (click)="showAddVehicle()"
+            (click)="showAddModal('vehicle')"
           ></p-button>
           <button
             type="button"
@@ -52,7 +52,7 @@
 
     <ng-template pTemplate="colgroup" let-columns>
       <colgroup>
-        <col *ngFor="let col of vehicleCols" style="width: 100px" />
+        <col *ngFor="let col of vehicleCols" [style.width]="col.width" />
         <col style="width: 140px" />
       </colgroup>
     </ng-template>
@@ -89,7 +89,10 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-rowData let-columns="columns">
-      <tr [pSelectableRow]="rowData" (click)="showVehicleDetails(rowData)">
+      <tr
+        [pSelectableRow]="rowData"
+        (click)="showDetailModal(rowData, 'vehicle')"
+      >
         <td *ngFor="let col of columns" class="text-justify">
           <span *ngIf="col.field === 'fechaalta'">
             {{ rowData[col.field] | date: "dd/MM/yyyy" }}
@@ -118,7 +121,7 @@
             pTooltip="Editar vehículo"
             tooltipPosition="bottom"
             (click)="
-              showEditVehicle(rowData);
+              showEditModal(rowData, 'vehicle');
               $event.stopImmediatePropagation();
               $event.preventDefault()
             "
@@ -131,7 +134,9 @@
             class="p-button-rounded p-button-danger p-button-outlined mx-2"
             pTooltip="Anular vehículo"
             tooltipPosition="bottom"
-            (click)="removeVehicle(rowData); $event.stopPropagation()"
+            (click)="
+              deleteRowData(rowData, 'vehicle'); $event.stopPropagation()
+            "
           ></button>
         </td>
       </tr>
@@ -146,10 +151,10 @@
 </div>
 
 <!-- DRIVERS TABLE -->
-<div *ngIf="driverCols" class="p-4">
+<div class="p-4">
   <h4 class="pb-2">Conductores</h4>
   <p-table
-    *ngIf="driverArray; else tableTemplate"
+    *ngIf="driverArray; else drTemplate"
     #driverTable
     [value]="driverArray"
     [columns]="driverCols"
@@ -177,7 +182,7 @@
         <div class="col">
           <p-button
             label=" Añadir conductor"
-            (click)="showAddDriver()"
+            (click)="showAddModal('driver')"
           ></p-button>
 
           <button
@@ -226,7 +231,10 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-rowData let-columns="columns">
-      <tr [pSelectableRow]="rowData" (click)="showDriverDetails(rowData)">
+      <tr
+        [pSelectableRow]="rowData"
+        (click)="showDetailModal(rowData, 'driver')"
+      >
         <td *ngFor="let col of columns" class="text-center">
           {{ rowData[col.field] }}
         </td>
@@ -240,7 +248,7 @@
             pTooltip="Editar conductor"
             tooltipPosition="bottom"
             (click)="
-              showEditDriver(rowData);
+              showEditModal(rowData, 'driver');
               $event.stopImmediatePropagation();
               $event.preventDefault()
             "
@@ -253,7 +261,7 @@
             class="p-button-rounded p-button-danger p-button-outlined mx-2"
             pTooltip="Anular conductor"
             tooltipPosition="bottom"
-            (click)="removeDriver(rowData); $event.stopPropagation()"
+            (click)="deleteRowData(rowData, 'driver'); $event.stopPropagation()"
           ></button>
         </td>
       </tr>
@@ -267,16 +275,20 @@
   </p-table>
 </div>
 
-<!-- NEW DRIVER DIALOG -->
+<!-- FORM DRIVER DIALOG -->
 <p-dialog
-  *ngIf="displayAddDriver"
-  header="Nuevo conductor"
+  *ngIf="displayFormDriverModal"
+  [header]="
+    formDriverGroup.controls.codigoEmpleado.value
+      ? 'Editar conductor'
+      : 'Nuevo conductor'
+  "
   [style]="{ width: '50vw' }"
   [modal]="true"
-  [(visible)]="displayAddDriver"
+  [(visible)]="displayFormDriverModal"
 >
   <form [formGroup]="formDriverGroup" class="form">
-    <div *ngFor="let col of driverCols; let n = index">
+    <div *ngFor="let col of driverCols">
       <label [for]="col.field">{{ col.header }} </label>
       <div class="col-5 mt-2 mb-4">
         <input
@@ -307,7 +319,7 @@
     <button
       type="button"
       class="btn btn-danger"
-      (click)="displayAddDriver = false"
+      (click)="displayFormDriverModal = false"
     >
       Cancelar
     </button>
@@ -315,60 +327,7 @@
       type="button"
       class="btn btn-primary"
       [disabled]="formDriverGroup.invalid"
-      (click)="saveDriver(true)"
-    >
-      Guardar
-    </button>
-  </ng-template>
-</p-dialog>
-
-<!-- EDIT DRIVER DIALOG -->
-<p-dialog
-  header="Editar conductor"
-  [style]="{ width: '50vw' }"
-  [modal]="true"
-  [(visible)]="displayEditDriver"
->
-  <form [formGroup]="formDriverGroup" class="form">
-    <div *ngFor="let col of driverCols; let n = index">
-      <label [for]="col.field">{{ col.header }} </label>
-      <div class="col-5 mt-2 mb-4">
-        <input
-          *ngIf="col.type === 'input'"
-          class="form-control"
-          [class.invalid]="
-            this.formDriverGroup.controls[col.field].touched &&
-            this.formDriverGroup.controls[col.field].invalid
-          "
-          [class.valid]="this.formDriverGroup.controls[col.field].valid"
-          [formControlName]="col.field"
-          [name]="col.field"
-        />
-        <p-multiSelect
-          *ngIf="col.type === 'select'"
-          optionLabel="name"
-          optionValue="value"
-          defaultLabel="Selecciona una opción"
-          [options]="col.options"
-          [formControlName]="col.field"
-        ></p-multiSelect>
-      </div>
-    </div>
-  </form>
-
-  <ng-template pTemplate="footer">
-    <button
-      type="button"
-      class="btn btn-danger"
-      (click)="displayEditDriver = false"
-    >
-      Cancelar
-    </button>
-    <button
-      type="button"
-      class="btn btn-primary"
-      [disabled]="formDriverGroup.invalid"
-      (click)="saveDriver()"
+      (click)="saveData('driver')"
     >
       Guardar
     </button>
@@ -393,86 +352,13 @@
   </div>
 </p-dialog>
 
-<!-- NEW VEHICLE DIALOG -->
+<!-- FORM VEHICLE DIALOG -->
 <p-dialog
-  header="Nuevo vehículo"
-  [(visible)]="displayAddVehicle"
-  [style]="{ width: '50vw' }"
-  [modal]="true"
->
-  <form [formGroup]="formVehicleGroup">
-    <div *ngFor="let col of vehicleCols" class="row">
-      <label [for]="col.field" class="col-12">{{ col.header }} </label>
-      <div class="col-5 mt-2 mb-4">
-        <input
-          *ngIf="col.type === 'input'"
-          class="form-control"
-          [class.invalid]="
-            this.formVehicleGroup.controls[col.field].touched &&
-            this.formVehicleGroup.controls[col.field].invalid
-          "
-          [class.valid]="this.formVehicleGroup.controls[col.field].valid"
-          [formControlName]="col.field"
-          [formControlName]="col.field"
-          [name]="col.field"
-        />
-        <p-dropdown
-          *ngIf="col.type === 'select'"
-          optionLabel="name"
-          optionValue="value"
-          placeholder="Selecciona una opción"
-          [options]="col.options"
-          [formControlName]="col.field"
-        ></p-dropdown>
-
-        <textarea
-          *ngIf="col.type === 'textarea'"
-          pInputTextarea
-          [rows]="3"
-          [cols]="50"
-          [formControlName]="col.field"
-        ></textarea>
-
-        <p-inputSwitch
-          *ngIf="col.type === 'checkbox'"
-          [formControlName]="col.field"
-        ></p-inputSwitch>
-
-        <p-calendar
-          *ngIf="col.type === 'date'"
-          [formControlName]="col.field"
-          dateFormat="dd.mm.yy"
-          [showButtonBar]="true"
-          [locale]="apiService.calendar.es"
-          [defaultDate]="apiService.calendar.today"
-        ></p-calendar>
-      </div>
-    </div>
-  </form>
-
-  <ng-template pTemplate="footer">
-    <button
-      type="button"
-      class="btn btn-danger"
-      (click)="displayAddVehicle = false"
-    >
-      Cancelar
-    </button>
-    <button
-      type="button"
-      class="btn btn-primary"
-      [disabled]="formVehicleGroup.invalid"
-      (click)="saveVehicle(true)"
-    >
-      Guardar
-    </button>
-  </ng-template>
-</p-dialog>
-
-<!-- EDIT VEHICLE DIALOG -->
-<p-dialog
-  header="Editar vehículo"
-  [(visible)]="displayEditVehicle"
+  *ngIf="displayFormVehicleModal"
+  [header]="
+    formVehicleGroup.controls.id.value ? 'Editar vehículo' : 'Nuevo vehículo'
+  "
+  [(visible)]="displayFormVehicleModal"
   [style]="{ width: '50vw' }"
   [modal]="true"
 >
@@ -531,7 +417,7 @@
     <button
       type="button"
       class="btn btn-danger"
-      (click)="displayEditVehicle = false"
+      (click)="displayFormVehicleModal = false"
     >
       Cancelar
     </button>
@@ -539,7 +425,7 @@
       type="button"
       class="btn btn-primary"
       [disabled]="formVehicleGroup.invalid"
-      (click)="saveVehicle()"
+      (click)="saveData('vehicle')"
     >
       Guardar
     </button>
@@ -556,9 +442,6 @@
 >
   <div *ngFor="let col of vehicleCols">
     <b>{{ col.header }}: </b>
-    <!-- <span *ngIf="apiService.selectedVehicle">{{
-      apiService.selectedVehicle[col.field]
-    }}</span> -->
     <span *ngIf="apiService.selectedVehicle">
       <span *ngIf="col.field != 'Activo'">
         {{ apiService.selectedVehicle[col.field] }}
@@ -570,20 +453,13 @@
   </div>
 </p-dialog>
 
+<!-- TOAST -->
 <p-toast></p-toast>
 
 <!-- LOADER -->
-<ng-template #tableTemplate>
-  <p-table [value]="[1, 2, 3, 4, 5]">
-    <ng-template pTemplate="header">
-      <tr>
-        <th *ngFor="let col of [1, 2, 3, 4]"></th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-product>
-      <tr>
-        <td *ngFor="let col of [1, 2, 3, 4]"><p-skeleton></p-skeleton></td>
-      </tr>
-    </ng-template>
-  </p-table>
+<ng-template #vhTemplate>
+  <app-skeleton-table #vhTemplate></app-skeleton-table>
+</ng-template>
+<ng-template #drTemplate>
+  <app-skeleton-table></app-skeleton-table>
 </ng-template>

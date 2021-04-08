@@ -6,10 +6,13 @@ export class Vehicle {
     private _modelo = '',
     private _tipofinanciacion = 0,
     private _fechaalta = '',
+    private _IDempleado = 0,
     private _idempresa = 0,
     private _kmactual = 0,
     private _idtipovehiculo = 0,
     private _IDtipoCombustible = 0,
+    private _emisiones = 0,
+    private _IDtipoTransmision = 0,
     private _IDEmpresaFinanciacion = 0,
     private _NumeroContrato = 0,
     private _Kmmaximos = 0,
@@ -60,6 +63,13 @@ export class Vehicle {
     this._fechaalta = value;
   }
 
+  get IDempleado(): number {
+    return this._IDempleado;
+  }
+  set IDempleado(value: number) {
+    this._IDempleado = value;
+  }
+
   get idempresa(): number {
     return this._idempresa;
   }
@@ -86,6 +96,20 @@ export class Vehicle {
   }
   set IDtipoCombustible(value: number) {
     this._IDtipoCombustible = value;
+  }
+
+  get emisiones(): number {
+    return this._emisiones;
+  }
+  set emisiones(value: number) {
+    this._emisiones = value;
+  }
+
+  get IDtipoTransmision(): number {
+    return this._IDtipoTransmision;
+  }
+  set IDtipoTransmision(value: number) {
+    this._IDtipoTransmision = value;
   }
 
   get IDEmpresaFinanciacion(): number {

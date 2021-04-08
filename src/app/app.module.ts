@@ -22,9 +22,10 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { FilterService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 import {SkeletonModule} from 'primeng/skeleton';
+import { SkeletonTableComponent } from './shared/components/skeleton-table/skeleton-table.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, SkeletonTableComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -48,5 +49,6 @@ import {SkeletonModule} from 'primeng/skeleton';
   ],
   providers: [ApiService, MessageService, FilterService],
   bootstrap: [AppComponent],
+  exports: [SkeletonTableComponent],
 })
 export class AppModule {}
