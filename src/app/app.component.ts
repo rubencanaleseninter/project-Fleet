@@ -15,16 +15,16 @@ export class AppComponent {
       icon: '',
       items: [
         {
-          label: 'Lista de vehículos',
-          icon: 'pi pi-fw pi-plus',
+          label: 'Vehículos',
+          icon: 'fas fa-shuttle-van',
           routerLink: '/fleet/vehicles-table',
         },
         {
-          label: 'Lista de conductores',
-          icon: 'pi pi-fw pi-external-link',
+          label: 'Conductores',
+          icon: 'fas fa-user-friends',
           routerLink: '/fleet/drivers-table',
         },
-        { label: 'Histórico', icon: 'pi pi-pw pi-file' },
+        { label: 'Histórico', icon: 'fas fa-file-alt' },
       ],
     },
   ];
