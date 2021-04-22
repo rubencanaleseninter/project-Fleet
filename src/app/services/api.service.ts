@@ -4,6 +4,7 @@ import { Subject, Observable, throwError, of } from 'rxjs';
 import { Driver } from '../models/driver.model';
 import { Vehicle } from '../models/fleet.model';
 import { catchError, map } from 'rxjs/operators';
+import { VehicleDto } from '../interfaces/fleet.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -150,10 +151,35 @@ export class ApiService {
    * Get a specific vehicle
    * @param id vehicle code
    */
-  getVehicle(id: number): Observable<Vehicle> {
-    return this.http
-      .post<Vehicle>(this.GATEWAY + this.API + this.VEHICLE, id)
-      .pipe(catchError((err) => throwError(err)));
+  getVehicle(id: number): Observable<VehicleDto> {
+    // return this.http
+    //   .post<Vehicle>(this.GATEWAY + this.API + this.VEHICLE, id)
+    //   .pipe(catchError((err) => throwError(err)));
+    return of({
+      rowId: 1,
+      plate: '3145BCD',
+      carframe: '0g896dh',
+      modelId: 1,
+      manufacturerId: 1,
+      financingTypeId: 1,
+      entryDate: new Date(),
+      leaveDate: undefined,
+      employeeId: 1,
+      assignedAtCompanyId: 1,
+      mileage: 5000,
+      vehicleTypeId: 1,
+      fuelTypeId: 1,
+      pollutingEmissions: 150,
+      transmissionTypeId: 1,
+      financialCompanyId: 1,
+      contractNumber: 8,
+      maxMileage: 12000,
+      monthlyFee: 1250,
+      active: true,
+      environmentLabelId: 1,
+      fuelConsumption: undefined,
+      observations: 'Al coche fantástico no le funciona el Aire',
+    });
   }
 
   /**

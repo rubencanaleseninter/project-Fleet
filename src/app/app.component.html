@@ -282,7 +282,7 @@
   <form [formGroup]="formDriverGroup" class="form">
     <div *ngFor="let col of driverCols">
       <label [for]="col.field">{{ col.header }} </label>
-      <div class="col-5 mt-2 mb-4">
+      <div class="col-lg-6 col-md-9 col-sm-12 mt-2 mb-4">
         <input
           *ngIf="col.type === 'input'"
           class="form-control"
@@ -297,6 +297,7 @@
         />
         <p-multiSelect
           *ngIf="col.type === 'select'"
+          styleClass="w-100"
           optionLabel="name"
           optionValue="value"
           defaultLabel="Selecciona una opción"
@@ -356,8 +357,8 @@
 >
   <form [formGroup]="formVehicleGroup">
     <div *ngFor="let col of vehicleCols" class="row">
-      <label [for]="col.field" class="col-12">{{ col.header }} </label>
-      <div class="col-5 mt-2 mb-4">
+      <label [for]="col.field">{{ col.header }} </label>
+      <div class="col-lg-6 col-md-9 col-sm-12 mt-2 mb-4">
         <input
           *ngIf="col.type === 'input'"
           class="form-control"
@@ -375,6 +376,7 @@
         />
         <p-dropdown
           *ngIf="col.type === 'select'"
+          styleClass="w-100"
           optionLabel="name"
           optionValue="value"
           placeholder="Selecciona una opción"
@@ -386,7 +388,7 @@
           *ngIf="col.type === 'textarea'"
           pInputTextarea
           [rows]="3"
-          [cols]="50"
+          [cols]="58"
           [formControlName]="col.field"
         ></textarea>
 
@@ -397,8 +399,9 @@
 
         <p-calendar
           *ngIf="col.type === 'date'"
-          [formControlName]="col.field"
+          styleClass="w-100"
           dateFormat="dd.mm.yy"
+          [formControlName]="col.field"
           [showButtonBar]="true"
           [locale]="apiService.calendar.es"
           [defaultDate]="apiService.calendar.today"

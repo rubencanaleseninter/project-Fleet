@@ -7,7 +7,7 @@
  * Move code from app.component.ts, app.component.html       *
  * app.component.scss to specific components                 *
  * Remove code from app ts, html ,scss                       *
- * Add menu or menuTab to the fleet modulo                   *
+ * Add menu or menuTab to the fleet module                   *
  * Test routes                                               *
  *************************************************************/
 
@@ -534,8 +534,10 @@ export class AppComponent implements OnInit {
    * @param rowData Vehicle
    */
   showEditVehicle(rowData: Vehicle): void {
-    this.displayFormVehicleModal = true;
-    this.formVehicleGroup.patchValue(rowData);
+    this.apiService.getVehicle(rowData.rowId).subscribe((res) => {
+      this.displayFormVehicleModal = true;
+      this.formVehicleGroup.patchValue(res);
+    });
   }
 
   /**
