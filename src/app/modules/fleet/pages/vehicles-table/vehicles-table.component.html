@@ -1,0 +1,259 @@
+<div class="p-4">
+  <h4 class="pb-2">Vehículos</h4>
+  <p-table
+    *ngIf="vehicleArray; else vhTemplate"
+    #vehicleTable
+    [value]="vehicleArray"
+    [columns]="vehicleTableCols"
+    [rows]="10"
+    [(selection)]="vehicleService.selectedVehicle"
+    (onRowSelect)="showEditVehicle(vehicleService.selectedVehicle)"
+    [rowHover]="true"
+    [showCurrentPageReport]="true"
+    [paginator]="true"
+    [globalFilterFields]="vehicleFilters"
+    [scrollable]="true"
+    [style]="{ width: '100%' }"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando {first} - {last} de {totalRecords} vehículos"
+  >
+    <ng-template pTemplate="caption">
+      <div class="row">
+        <div class="col-lg-4 col-md-8 col-sm-12">
+          <input
+            #searchVehicle
+            class="form-control"
+            type="search"
+            pInputText
+            placeholder="Buscar ..."
+            (input)="vehicleTable.filterGlobal(searchVehicle.value, 'contains')"
+          />
+        </div>
+
+        <div class="col">
+          <p-button
+            label=" Añadir vehículo"
+            (click)="showAddVehicle()"
+          ></p-button>
+          <button
+            type="button"
+            pButton
+            pRipple
+            class="p-button-success mx-4"
+            icon="pi pi-file-excel"
+            (click)="vehicleTable.exportCSV()"
+            pTooltip="Exportar tabla csv"
+            tooltipPosition="bottom"
+          ></button>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="colgroup" let-columns>
+      <colgroup>
+        <col *ngFor="let col of vehicleTableCols" [style.width]="col.width" />
+        <col style="width: 140px" />
+      </colgroup>
+    </ng-template>
+
+    <ng-template pTemplate="header" let-columns>
+      <tr>
+        <th
+          *ngFor="let col of vehicleTableCols"
+          class="text-center"
+          [pSortableColumn]="col.field"
+        >
+          {{ col.header }}
+          <p-sortIcon
+            [field]="col.field"
+            ariaLabel="Activate to sort"
+            ariaLabelDesc="Activate to sort in descending order"
+            ariaLabelAsc="Activate to sort in ascending order"
+          ></p-sortIcon>
+          <p-columnFilter
+            type="text"
+            [field]="col.field"
+            display="menu"
+            [showMatchModes]="true"
+            [showAddButton]="false"
+            [showOperator]="false"
+          >
+            <ng-template pTemplate="header">
+              <h6 class="px-4 pt-3">{{ col.header }}</h6>
+            </ng-template>
+          </p-columnFilter>
+        </th>
+        <th class="text-center"></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-rowData let-columns="columns">
+      <tr (click)="showVehicleDetails(rowData)">
+        <td *ngFor="let col of columns" class="text-justify">
+          <span *ngIf="col.field === 'fechaalta'">
+            {{ rowData[col.field] | date: "dd/MM/yyyy" }}
+          </span>
+
+          <span *ngIf="col.field === 'active'; else elseBlock">
+            {{ rowData[col.field] ? "Activo" : "Inactivo" }}
+          </span>
+          <ng-template #elseBlock>
+            <span
+              [ngStyle]="{
+                'font-size': col.field === 'Observaciones' ? '0.9em' : ''
+              }"
+            >
+              {{ rowData[col.field] }}
+            </span>
+          </ng-template>
+        </td>
+        <td class="text-center">
+          <button
+            pButton
+            pRipple
+            type="button"
+            class="p-button-rounded p-button-outlined mx-2"
+            icon="pi pi-pencil"
+            pTooltip="Editar vehículo"
+            tooltipPosition="bottom"
+            (click)="
+              showEditVehicle(rowData);
+              $event.stopImmediatePropagation();
+              $event.preventDefault()
+            "
+          ></button>
+          <button
+            pButton
+            pRipple
+            type="button"
+            icon="pi pi-times"
+            class="p-button-rounded p-button-danger p-button-outlined mx-2"
+            pTooltip="Anular vehículo"
+            tooltipPosition="bottom"
+            (click)="removeVehicle(rowData); $event.stopPropagation()"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage" let-columns>
+      <tr>
+        <td [attr.colspan]="columns.length">No se han obtenido resultados</td>
+      </tr>
+    </ng-template>
+  </p-table>
+  
+  <!-- LOADER -->
+  <ng-template #vhTemplate>
+    <app-skeleton-table #vhTemplate></app-skeleton-table>
+  </ng-template>
+</div>
+
+
+<!-- FORM VEHICLE DIALOG -->
+<p-dialog
+  *ngIf="displayFormVehicleModal"
+  [header]="
+    formVehicleGroup.controls.rowId.value ? 'Editar vehículo' : 'Nuevo vehículo'
+  "
+  [(visible)]="displayFormVehicleModal"
+  [style]="{ width: '50vw' }"
+  [modal]="true"
+>
+  <form [formGroup]="formVehicleGroup">
+    <div *ngFor="let col of vehicleCols" class="row">
+      <label [for]="col.field">{{ col.header }} </label>
+      <div class="col-lg-6 col-md-9 col-sm-12 mt-2 mb-4">
+        <input
+          *ngIf="col.type === 'input'"
+          class="form-control"
+          [class.invalid]="
+            this.formVehicleGroup.controls[col.field].touched &&
+            this.formVehicleGroup.controls[col.field].invalid
+          "
+          [class.valid]="
+            this.formVehicleGroup.controls[col.field].touched &&
+            this.formVehicleGroup.controls[col.field].valid
+          "
+          [formControlName]="col.field"
+          [formControlName]="col.field"
+          [name]="col.field"
+        />
+        <p-dropdown
+          *ngIf="col.type === 'select'"
+          styleClass="w-100"
+          optionLabel="name"
+          optionValue="value"
+          placeholder="Selecciona una opción"
+          [options]="col.options"
+          [formControlName]="col.field"
+        ></p-dropdown>
+
+        <textarea
+          *ngIf="col.type === 'textarea'"
+          pInputTextarea
+          [rows]="3"
+          [cols]="58"
+          [formControlName]="col.field"
+        ></textarea>
+
+        <p-inputSwitch
+          *ngIf="col.type === 'checkbox'"
+          [formControlName]="col.field"
+        ></p-inputSwitch>
+
+        <p-calendar
+          *ngIf="col.type === 'date'"
+          styleClass="w-100"
+          dateFormat="dd.mm.yy"
+          [formControlName]="col.field"
+          [showButtonBar]="true"
+          [locale]="vehicleService.calendar.es"
+          [defaultDate]="vehicleService.calendar.today"
+        ></p-calendar>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <button
+      type="button"
+      class="btn btn-danger"
+      (click)="displayFormVehicleModal = false"
+    >
+      Cancelar
+    </button>
+    <button
+      type="button"
+      class="btn btn-primary"
+      [disabled]="formVehicleGroup.invalid"
+      (click)="saveVehicle()"
+    >
+      Guardar
+    </button>
+  </ng-template>
+</p-dialog>
+
+<!-- VEHICLE DETAIL DIALOG -->
+<p-dialog
+  header="Detalles del vehículo"
+  [(visible)]="displayVehicleDetails"
+  [dismissableMask]="true"
+  [style]="{ width: '50vw' }"
+  [modal]="true"
+>
+  <div *ngFor="let col of vehicleTableCols">
+    <b>{{ col.header }}: </b>
+    <span *ngIf="vehicleService.selectedVehicle">
+      <span *ngIf="col.field != 'active'">
+        {{ vehicleService.selectedVehicle[col.field] }}
+      </span>
+      <span *ngIf="col.field === 'active'">
+        {{ vehicleService.selectedVehicle[col.field] ? "Activo" : "Inactivo" }}
+      </span>
+    </span>
+  </div>
+</p-dialog>
+
+<!-- TOAST -->
+<p-toast></p-toast>

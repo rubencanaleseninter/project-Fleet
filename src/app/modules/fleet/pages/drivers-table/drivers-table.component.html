@@ -1,0 +1,206 @@
+<div class="p-4">
+  <h4 class="pb-2">Conductores</h4>
+  <p-table
+    *ngIf="driverArray; else drTemplate"
+    #driverTable
+    [value]="driverArray"
+    [columns]="driverCols"
+    [rows]="10"
+    [(selection)]="driverService.selectedDriver"
+    [rowHover]="true"
+    [showCurrentPageReport]="true"
+    [paginator]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando {first} - {last} de {totalRecords} vehículos"
+    [globalFilterFields]="driverFilters"
+  >
+    <ng-template pTemplate="caption">
+      <div class="row">
+        <div class="col-lg-4 col-md-8 col-sm-10">
+          <input
+            #searchDriver
+            class="form-control"
+            type="search"
+            pInputText
+            placeholder="Buscar ..."
+            (input)="driverTable.filterGlobal(searchDriver.value, 'contains')"
+          />
+        </div>
+        <div class="col">
+          <p-button
+            label=" Añadir conductor"
+            (click)="showAddDriver()"
+          ></p-button>
+
+          <button
+            type="button"
+            pButton
+            pRipple
+            class="p-button-success mx-4"
+            icon="pi pi-file-excel"
+            (click)="driverTable.exportCSV()"
+            pTooltip="Exportar tabla csv"
+            tooltipPosition="bottom"
+          ></button>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header" let-columns>
+      <tr>
+        <th
+          *ngFor="let col of driverCols"
+          class="text-center"
+          [pSortableColumn]="col.field"
+        >
+          {{ col.header }}
+          <p-sortIcon
+            [field]="col.field"
+            ariaLabel="Activate to sort"
+            ariaLabelDesc="Activate to sort in descending order"
+            ariaLabelAsc="Activate to sort in ascending order"
+          ></p-sortIcon>
+          <p-columnFilter
+            type="text"
+            [field]="col.field"
+            display="menu"
+            [showMatchModes]="true"
+            [showAddButton]="false"
+            [showOperator]="false"
+          >
+            <ng-template pTemplate="header">
+              <h6 class="px-4 pt-3">{{ col.header }}</h6>
+            </ng-template>
+          </p-columnFilter>
+        </th>
+        <th class="text-center"></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-rowData let-columns="columns">
+      <tr (click)="showDriverDetails(rowData)">
+        <td *ngFor="let col of columns" class="text-center">
+          {{ rowData[col.field] }}
+        </td>
+        <td class="text-center">
+          <button
+            pButton
+            pRipple
+            type="button"
+            class="p-button-rounded p-button-outlined mx-2"
+            icon="pi pi-pencil"
+            pTooltip="Editar conductor"
+            tooltipPosition="bottom"
+            (click)="
+              showEditDriver(rowData);
+              $event.stopImmediatePropagation();
+              $event.preventDefault()
+            "
+          ></button>
+          <button
+            pButton
+            pRipple
+            type="button"
+            icon="pi pi-times"
+            class="p-button-rounded p-button-danger p-button-outlined mx-2"
+            pTooltip="Anular conductor"
+            tooltipPosition="bottom"
+            (click)="removeDriver(rowData); $event.stopPropagation()"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage" let-columns>
+      <tr>
+        <td [attr.colspan]="columns.length">No se han obtenido resultados</td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <!-- LOADER -->
+  <ng-template #drTemplate>
+    <app-skeleton-table></app-skeleton-table>
+  </ng-template>
+</div>
+
+<!-- FORM DRIVER DIALOG -->
+<p-dialog
+  *ngIf="displayFormDriverModal"
+  [header]="
+    formDriverGroup.controls.codigoEmpleado.value
+      ? 'Editar conductor'
+      : 'Nuevo conductor'
+  "
+  [style]="{ width: '50vw' }"
+  [modal]="true"
+  [(visible)]="displayFormDriverModal"
+>
+  <form [formGroup]="formDriverGroup" class="form">
+    <div *ngFor="let col of driverCols">
+      <label [for]="col.field">{{ col.header }} </label>
+      <div class="col-lg-6 col-md-9 col-sm-12 mt-2 mb-4">
+        <input
+          *ngIf="col.type === 'input'"
+          class="form-control"
+          [class.invalid]="
+            this.formDriverGroup.controls[col.field].touched &&
+            this.formDriverGroup.controls[col.field].invalid
+          "
+          [class.valid]="this.formDriverGroup.controls[col.field].valid"
+          [formControlName]="col.field"
+          [formControlName]="col.field"
+          [name]="col.field"
+        />
+        <p-multiSelect
+          *ngIf="col.type === 'select'"
+          styleClass="w-100"
+          optionLabel="name"
+          optionValue="value"
+          defaultLabel="Selecciona una opción"
+          [options]="col.options"
+          [formControlName]="col.field"
+        ></p-multiSelect>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <button
+      type="button"
+      class="btn btn-danger"
+      (click)="displayFormDriverModal = false"
+    >
+      Cancelar
+    </button>
+    <button
+      type="button"
+      class="btn btn-primary"
+      [disabled]="formDriverGroup.invalid"
+      (click)="saveDriver()"
+    >
+      Guardar
+    </button>
+  </ng-template>
+</p-dialog>
+
+<!-- DRIVER DETAIL DIALOG -->
+<p-dialog
+  header="Detalles del conductor"
+  [(visible)]="displayDriverDetails"
+  [dismissableMask]="true"
+  [closable]="true"
+  [closeOnEscape]="true"
+  [style]="{ width: '50vw' }"
+  [modal]="true"
+>
+  <div *ngFor="let col of driverCols">
+    <b>{{ col.header }}: </b>
+    <span *ngIf="driverService.selectedDriver">{{
+      driverService.selectedDriver[col.field]
+    }}</span>
+  </div>
+</p-dialog>
+
+<!-- TOAST -->
+<p-toast></p-toast>

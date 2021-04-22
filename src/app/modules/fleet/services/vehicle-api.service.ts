@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject, Observable, throwError, of } from 'rxjs';
-import { Driver } from '../models/driver.model';
 import { Vehicle } from '../models/fleet.model';
 import { catchError, map } from 'rxjs/operators';
 import { VehicleDto } from '../interfaces/fleet.interface';
@@ -9,13 +8,10 @@ import { VehicleDto } from '../interfaces/fleet.interface';
 @Injectable({
   providedIn: 'root',
 })
-export class ApiService {
-  // PATHS
+export class VehicleApiService {
   private GATEWAY = 'gateway';
   private API = '/fleet';
-  private ALL_DRIVERS = '/all-drivers';
   private ALL_VEHICLES = '/all-vehicles';
-  private DRIVER = '/driver';
   private VEHICLE = '/vehicle';
   private FINANCING_TYPES = '/financing_types';
   private COMBUSTIBLE_TYPES = '/combustible_types';
@@ -25,12 +21,9 @@ export class ApiService {
   private MANUFACTURERS = '/manufacturers';
   private TRANSMISSION_TYPES = '/transmission_types';
   private ENVIRONMENT_LABEL_TYPES = '/environment_label_types';
-  // DATA
+
   selectedVehicle$ = new Subject<Vehicle>();
   selectedVehicle: any;
-  selectedDriver$ = new Subject<Driver>();
-  selectedDriver: any;
-  // CALENDAR OPTIONS
   calendar = {
     es: {
       firstDayOfWeek: 1,
@@ -98,21 +91,6 @@ export class ApiService {
     this.selectedVehicle$.next(vehicle);
   }
 
-  /**
-   * Observable selected driver
-   */
-  getSelectedDriver(): Observable<Driver> {
-    return this.selectedDriver$.asObservable();
-  }
-
-  /**
-   * Set selected driver
-   */
-  SetSelectedDriver(driver: Driver): void {
-    this.selectedDriver = driver;
-    this.selectedDriver$.next(driver);
-  }
-
   /* ===== API CALLS ===== */
 
   /**
@@ -128,22 +106,6 @@ export class ApiService {
     // FIXME: Remove fake calls
     return this.http
       .get<Vehicle[]>('/assets/vehicles.json')
-      .pipe(catchError((err) => throwError(err)));
-  }
-
-  /**
-   * Get drivers list
-   */
-  getAllDrivers(): Observable<Driver[]> {
-    /** API CALL BE */
-    // return this.http
-    //   .get<Driver[]>(this.GATEWAY + this.API + this.ALL_DRIVERS)
-    //   .pipe(catchError((err) => throwError(err)));
-
-    /** LOCAL JSON */
-    // FIXME: Remove fake calls
-    return this.http
-      .get<Driver[]>('/assets/drivers.json')
       .pipe(catchError((err) => throwError(err)));
   }
 
@@ -180,16 +142,6 @@ export class ApiService {
       fuelConsumption: undefined,
       observations: 'Al coche fantástico no le funciona el Aire',
     });
-  }
-
-  /**
-   * Get a specific driver
-   * @param id codeEmployee
-   */
-  getDriver(id: number): Observable<Driver> {
-    return this.http
-      .post<Driver>(this.GATEWAY + this.API + this.DRIVER, id)
-      .pipe(catchError((err) => throwError(err)));
   }
 
   /**
@@ -338,17 +290,7 @@ export class ApiService {
    */
   saveVehicle(vehicle: Vehicle): Observable<any> {
     return this.http
-      .post<Vehicle>(this.GATEWAY + this.API + this.DRIVER, vehicle)
-      .pipe(catchError((err) => throwError(err)));
-  }
-
-  /**
-   * Save a new or edited driver
-   * @param driver Driver
-   */
-  saveDriver(driver: Driver): Observable<any> {
-    return this.http
-      .post<Driver>(this.GATEWAY + this.API + this.DRIVER, driver)
+      .post<Vehicle>(this.GATEWAY + this.API + this.VEHICLE, vehicle)
       .pipe(catchError((err) => throwError(err)));
   }
 
@@ -358,17 +300,7 @@ export class ApiService {
    */
   deleteVehicle(id: string): Observable<any> {
     return this.http
-      .post<string>(this.GATEWAY + this.API + this.DRIVER, id)
-      .pipe(catchError((err) => throwError(err)));
-  }
-
-  /**
-   * Delete the selected driver
-   * @param id string
-   */
-  deleteDriver(id: string): Observable<any> {
-    return this.http
-      .post<string>(this.GATEWAY + this.API + this.DRIVER, id)
+      .post<string>(this.GATEWAY + this.API + this.VEHICLE, id)
       .pipe(catchError((err) => throwError(err)));
   }
 }
