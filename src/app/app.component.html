@@ -5,10 +5,10 @@
     *ngIf="vehicleArray; else vhTemplate"
     #vehicleTable
     [value]="vehicleArray"
-    [columns]="vehicleCols"
+    [columns]="vehicleTableCols"
     [rows]="10"
     [(selection)]="apiService.selectedVehicle"
-    (onRowSelect)="showEditModal(apiService.selectedVehicle, 'vehicle')"
+    (onRowSelect)="showEditVehicle(apiService.selectedVehicle)"
     [rowHover]="true"
     [showCurrentPageReport]="true"
     [paginator]="true"
@@ -34,7 +34,7 @@
         <div class="col">
           <p-button
             label=" Añadir vehículo"
-            (click)="showAddModal('vehicle')"
+            (click)="showAddVehicle()"
           ></p-button>
           <button
             type="button"
@@ -52,7 +52,7 @@
 
     <ng-template pTemplate="colgroup" let-columns>
       <colgroup>
-        <col *ngFor="let col of vehicleCols" [style.width]="col.width" />
+        <col *ngFor="let col of vehicleTableCols" [style.width]="col.width" />
         <col style="width: 140px" />
       </colgroup>
     </ng-template>
@@ -60,7 +60,7 @@
     <ng-template pTemplate="header" let-columns>
       <tr>
         <th
-          *ngFor="let col of vehicleCols"
+          *ngFor="let col of vehicleTableCols"
           class="text-center"
           [pSortableColumn]="col.field"
         >
@@ -89,16 +89,13 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-rowData let-columns="columns">
-      <tr
-        [pSelectableRow]="rowData"
-        (click)="showDetailModal(rowData, 'vehicle')"
-      >
+      <tr (click)="showVehicleDetails(rowData)">
         <td *ngFor="let col of columns" class="text-justify">
           <span *ngIf="col.field === 'fechaalta'">
             {{ rowData[col.field] | date: "dd/MM/yyyy" }}
           </span>
 
-          <span *ngIf="col.field === 'Activo'; else elseBlock">
+          <span *ngIf="col.field === 'active'; else elseBlock">
             {{ rowData[col.field] ? "Activo" : "Inactivo" }}
           </span>
           <ng-template #elseBlock>
@@ -121,7 +118,7 @@
             pTooltip="Editar vehículo"
             tooltipPosition="bottom"
             (click)="
-              showEditModal(rowData, 'vehicle');
+              showEditVehicle(rowData);
               $event.stopImmediatePropagation();
               $event.preventDefault()
             "
@@ -134,9 +131,7 @@
             class="p-button-rounded p-button-danger p-button-outlined mx-2"
             pTooltip="Anular vehículo"
             tooltipPosition="bottom"
-            (click)="
-              deleteRowData(rowData, 'vehicle'); $event.stopPropagation()
-            "
+            (click)="removeVehicle(rowData); $event.stopPropagation()"
           ></button>
         </td>
       </tr>
@@ -182,7 +177,7 @@
         <div class="col">
           <p-button
             label=" Añadir conductor"
-            (click)="showAddModal('driver')"
+            (click)="showAddDriver()"
           ></p-button>
 
           <button
@@ -231,10 +226,7 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-rowData let-columns="columns">
-      <tr
-        [pSelectableRow]="rowData"
-        (click)="showDetailModal(rowData, 'driver')"
-      >
+      <tr (click)="showDriverDetails(rowData)">
         <td *ngFor="let col of columns" class="text-center">
           {{ rowData[col.field] }}
         </td>
@@ -248,7 +240,7 @@
             pTooltip="Editar conductor"
             tooltipPosition="bottom"
             (click)="
-              showEditModal(rowData, 'driver');
+              showEditDriver(rowData);
               $event.stopImmediatePropagation();
               $event.preventDefault()
             "
@@ -261,7 +253,7 @@
             class="p-button-rounded p-button-danger p-button-outlined mx-2"
             pTooltip="Anular conductor"
             tooltipPosition="bottom"
-            (click)="deleteRowData(rowData, 'driver'); $event.stopPropagation()"
+            (click)="removeDriver(rowData); $event.stopPropagation()"
           ></button>
         </td>
       </tr>
@@ -327,7 +319,7 @@
       type="button"
       class="btn btn-primary"
       [disabled]="formDriverGroup.invalid"
-      (click)="saveData('driver')"
+      (click)="saveDriver()"
     >
       Guardar
     </button>
@@ -356,15 +348,15 @@
 <p-dialog
   *ngIf="displayFormVehicleModal"
   [header]="
-    formVehicleGroup.controls.id.value ? 'Editar vehículo' : 'Nuevo vehículo'
+    formVehicleGroup.controls.rowId.value ? 'Editar vehículo' : 'Nuevo vehículo'
   "
   [(visible)]="displayFormVehicleModal"
   [style]="{ width: '50vw' }"
   [modal]="true"
 >
   <form [formGroup]="formVehicleGroup">
-    <div *ngFor="let col of vehicleCols">
-      <label [for]="col.field">{{ col.header }} </label>
+    <div *ngFor="let col of vehicleCols" class="row">
+      <label [for]="col.field" class="col-12">{{ col.header }} </label>
       <div class="col-5 mt-2 mb-4">
         <input
           *ngIf="col.type === 'input'"
@@ -373,12 +365,14 @@
             this.formVehicleGroup.controls[col.field].touched &&
             this.formVehicleGroup.controls[col.field].invalid
           "
-          [class.valid]="this.formVehicleGroup.controls[col.field].valid"
+          [class.valid]="
+            this.formVehicleGroup.controls[col.field].touched &&
+            this.formVehicleGroup.controls[col.field].valid
+          "
           [formControlName]="col.field"
           [formControlName]="col.field"
           [name]="col.field"
         />
-
         <p-dropdown
           *ngIf="col.type === 'select'"
           optionLabel="name"
@@ -425,7 +419,7 @@
       type="button"
       class="btn btn-primary"
       [disabled]="formVehicleGroup.invalid"
-      (click)="saveData('vehicle')"
+      (click)="saveVehicle()"
     >
       Guardar
     </button>
@@ -440,13 +434,13 @@
   [style]="{ width: '50vw' }"
   [modal]="true"
 >
-  <div *ngFor="let col of vehicleCols">
+  <div *ngFor="let col of vehicleTableCols">
     <b>{{ col.header }}: </b>
     <span *ngIf="apiService.selectedVehicle">
-      <span *ngIf="col.field != 'Activo'">
+      <span *ngIf="col.field != 'active'">
         {{ apiService.selectedVehicle[col.field] }}
       </span>
-      <span *ngIf="col.field === 'Activo'">
+      <span *ngIf="col.field === 'active'">
         {{ apiService.selectedVehicle[col.field] ? "Activo" : "Inactivo" }}
       </span>
     </span>

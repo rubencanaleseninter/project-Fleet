@@ -1,156 +1,186 @@
 export class Vehicle {
-  constructor(
-    private _id = 0,
-    private _matricula = '',
-    private _bastidor = '',
-    private _modelo = '',
-    private _tipofinanciacion = 0,
-    private _fechaalta = '',
-    private _IDempleado = 0,
-    private _idempresa = 0,
-    private _kmactual = 0,
-    private _idtipovehiculo = 0,
-    private _IDtipoCombustible = 0,
-    private _emisiones = 0,
-    private _IDtipoTransmision = 0,
-    private _IDEmpresaFinanciacion = 0,
-    private _NumeroContrato = 0,
-    private _Kmmaximos = 0,
-    private _Cuotamensual = 0,
-    private _Activo = true,
-    private _Observaciones = ''
-  ) {}
+  private _rowId!: number;
+  private _plate!: string;
+  private _carframe!: string;
+  private _manufacturerId!: number;
+  private _modelId!: number;
+  private _entryDate!: Date;
+  private _leavingDate!: Date;
+  private _employeeId!: number;
+  private _assignedAtCompanyId!: number;
+  private _mileage!: number;
+  private _vehicleTypeId!: number;
+  private _fuelTypeId!: number;
+  private _pollutingEmissions!: number;
+  private _transmissionTypeId!: number;
+  private _financialCompanyId!: number;
+  private _financingTypeId!: number;
+  private _contractNumber!: number;
+  private _maxMileage!: number;
+  private _monthlyFee!: number;
+  private _active = true;
+  private _environmentLabelId!: number;
+  private _fuelConsumption!: number;
+  private _observations!: string;
 
-  get id(): number {
-    return this._id;
+  get rowId(): number {
+    return this._rowId;
   }
-  set id(value: number) {
-    this._id = value;
-  }
-
-  get matricula(): string {
-    return this._matricula;
-  }
-  set matricula(value: string) {
-    this._matricula = value;
+  set rowId(value: number) {
+    this._rowId = value;
   }
 
-  get bastidor(): string {
-    return this._bastidor;
+  get plate(): string {
+    return this._plate;
   }
-  set bastidor(value: string) {
-    this._bastidor = value;
-  }
-
-  get modelo(): string {
-    return this._modelo;
-  }
-  set modelo(value: string) {
-    this._modelo = value;
+  set plate(value: string) {
+    this._plate = value;
   }
 
-  get tipofinanciacion(): number {
-    return this._tipofinanciacion;
+  get carframe(): string {
+    return this._carframe;
   }
-  set tipofinanciacion(value: number) {
-    this._tipofinanciacion = value;
-  }
-
-  get fechaalta(): string {
-    return this._fechaalta;
-  }
-  set fechaalta(value: string) {
-    this._fechaalta = value;
+  set carframe(value: string) {
+    this._carframe = value;
   }
 
-  get IDempleado(): number {
-    return this._IDempleado;
+  get manufacturerId(): number {
+    return this._manufacturerId;
   }
-  set IDempleado(value: number) {
-    this._IDempleado = value;
-  }
-
-  get idempresa(): number {
-    return this._idempresa;
-  }
-  set idempresa(value: number) {
-    this._idempresa = value;
+  set manufacturerId(value: number) {
+    this._manufacturerId = value;
   }
 
-  get kmactual(): number {
-    return this._kmactual;
+  get modelId(): number {
+    return this._modelId;
   }
-  set kmactual(value: number) {
-    this._kmactual = value;
-  }
-
-  get idtipovehiculo(): number {
-    return this._idtipovehiculo;
-  }
-  set idtipovehiculo(value: number) {
-    this._idtipovehiculo = value;
+  set modelId(value: number) {
+    this._modelId = value;
   }
 
-  get IDtipoCombustible(): number {
-    return this._IDtipoCombustible;
+  get entryDate(): Date {
+    return this._entryDate;
   }
-  set IDtipoCombustible(value: number) {
-    this._IDtipoCombustible = value;
-  }
-
-  get emisiones(): number {
-    return this._emisiones;
-  }
-  set emisiones(value: number) {
-    this._emisiones = value;
+  set entryDate(value: Date) {
+    this._entryDate = value;
   }
 
-  get IDtipoTransmision(): number {
-    return this._IDtipoTransmision;
+  get leavingDate(): Date {
+    return this._leavingDate;
   }
-  set IDtipoTransmision(value: number) {
-    this._IDtipoTransmision = value;
-  }
-
-  get IDEmpresaFinanciacion(): number {
-    return this._IDEmpresaFinanciacion;
-  }
-  set IDEmpresaFinanciacion(value: number) {
-    this._IDEmpresaFinanciacion = value;
+  set leavingDate(value: Date) {
+    this._leavingDate = value;
   }
 
-  get NumeroContrato(): number {
-    return this._NumeroContrato;
+  get employeeId(): number {
+    return this._employeeId;
   }
-  set NumeroContrato(value: number) {
-    this._NumeroContrato = value;
-  }
-
-  get Kmmaximos(): number {
-    return this._Kmmaximos;
-  }
-  set Kmmaximos(value: number) {
-    this._Kmmaximos = value;
+  set employeeId(value: number) {
+    this._employeeId = value;
   }
 
-  get Cuotamensual(): number {
-    return this._Cuotamensual;
+  get assignedAtCompanyId(): number {
+    return this._assignedAtCompanyId;
   }
-  set Cuotamensual(value: number) {
-    this._Cuotamensual = value;
-  }
-
-  get Activo(): boolean {
-    return this._Activo;
-  }
-  set Activo(value: boolean) {
-    this._Activo = value;
+  set assignedAtCompanyId(value: number) {
+    this._assignedAtCompanyId = value;
   }
 
-  get Observaciones(): string {
-    return this._Observaciones;
+  get mileage(): number {
+    return this._mileage;
   }
-  set Observaciones(value: string) {
-    this._Observaciones = value;
+  set mileage(value: number) {
+    this._mileage = value;
+  }
+
+  get vehicleTypeId(): number {
+    return this._vehicleTypeId;
+  }
+  set vehicleTypeId(value: number) {
+    this._vehicleTypeId = value;
+  }
+
+  get fuelTypeId(): number {
+    return this._fuelTypeId;
+  }
+  set fuelTypeId(value: number) {
+    this._fuelTypeId = value;
+  }
+
+  get pollutingEmissions(): number {
+    return this._pollutingEmissions;
+  }
+  set pollutingEmissions(value: number) {
+    this._pollutingEmissions = value;
+  }
+
+  get transmissionTypeId(): number {
+    return this._transmissionTypeId;
+  }
+  set transmissionTypeId(value: number) {
+    this._transmissionTypeId = value;
+  }
+
+  get financialCompanyId(): number {
+    return this._financialCompanyId;
+  }
+  set financialCompanyId(value: number) {
+    this._financialCompanyId = value;
+  }
+
+  get financingTypeId(): number {
+    return this._financingTypeId;
+  }
+  set financingTypeId(value: number) {
+    this._financingTypeId = value;
+  }
+
+  get contractNumber(): number {
+    return this._contractNumber;
+  }
+  set contractNumber(value: number) {
+    this._contractNumber = value;
+  }
+
+  get maxMileage(): number {
+    return this._maxMileage;
+  }
+  set maxMileage(value: number) {
+    this._maxMileage = value;
+  }
+
+  get monthlyFee(): number {
+    return this._monthlyFee;
+  }
+  set monthlyFee(value: number) {
+    this._monthlyFee = value;
+  }
+
+  get active(): boolean {
+    return this._active;
+  }
+  set active(value: boolean) {
+    this._active = value;
+  }
+
+  get environmentLabelId(): number {
+    return this._environmentLabelId;
+  }
+  set environmentLabelId(value: number) {
+    this._environmentLabelId = value;
+  }
+
+  get fuelConsumption(): number {
+    return this._fuelConsumption;
+  }
+  set fuelConsumption(value: number) {
+    this._fuelConsumption = value;
+  }
+
+  get observations(): string {
+    return this._observations;
+  }
+  set observations(value: string) {
+    this._observations = value;
   }
 }

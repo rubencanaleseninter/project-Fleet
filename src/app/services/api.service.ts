@@ -23,6 +23,7 @@ export class ApiService {
   private FINANCING_COMPANIES = '/financing_companies';
   private MANUFACTURERS = '/manufacturers';
   private TRANSMISSION_TYPES = '/transmission_types';
+  private ENVIRONMENT_LABEL_TYPES = '/environment_label_types';
   // DATA
   selectedVehicle$ = new Subject<Vehicle>();
   selectedVehicle: any;
@@ -168,14 +169,14 @@ export class ApiService {
   /**
    * Get vehicle ids
    */
-  getVehicleIds(): Observable<any[]> {
+  getVehicleIds(): Observable<Vehicle[]> {
     return this.http.get<any[]>('/assets/vehicles.json').pipe(
       map((res: any[]) => {
         const vehicleIds: any[] = [];
-        res.forEach((vh: any) => {
+        res.forEach((vh: Vehicle) => {
           vehicleIds.push({
-            name: vh.matricula.toString(),
-            value: vh.matricula,
+            name: vh.plate.toString(),
+            value: vh.plate,
           });
         });
         return vehicleIds;
@@ -192,7 +193,7 @@ export class ApiService {
     //   .get<any[]>(this.GATEWAY + this.API + this.FINANCING_TYPES)
     //   .pipe(catchError((err) => throwError(err)));
     return of([
-      { name: 'No asignado', value: 0 },
+      { name: 'Sin asignar', value: 0 },
       { name: 'Renting - 48 Meses', value: 1 },
     ]);
   }
@@ -205,7 +206,7 @@ export class ApiService {
     //   .get<any[]>(this.GATEWAY + this.API + this.FINANCING_COMPANIES)
     //   .pipe(catchError((err) => throwError(err)));
     return of([
-      { name: 'No asignado', value: 0 },
+      { name: 'Sin asignar', value: 0 },
       { name: 'Alphabet', value: 1 },
       { name: 'Cooltra Motos SLU', value: 2 },
     ]);
@@ -219,7 +220,7 @@ export class ApiService {
     //   .get<any[]>(this.GATEWAY + this.API + this.VEHICLE_TYPES)
     //   .pipe(catchError((err) => throwError(err)));
     return of([
-      { name: 'No asignado', value: 0 },
+      { name: 'Sin asignar', value: 0 },
       { name: 'Turismo', value: 1 },
       { name: 'Motocicleta', value: 2 },
       { name: 'Furgoneta', value: 3 },
@@ -235,8 +236,8 @@ export class ApiService {
     //   .get<any[]>(this.GATEWAY + this.API + this.VEHICLE_MODELS)
     //   .pipe(catchError((err) => throwError(err)));
     return of([
-      { name: 'No asignado', value: 0 },
-      { name: 'Gold', value: 1 },
+      { name: 'Sin asignar', value: 0 },
+      { name: 'Golf', value: 1 },
       { name: 'Polo', value: 2 },
       { name: 'Kangoo', value: 3 },
       { name: 'Tricity 125 ABS', value: 4 },
@@ -251,7 +252,7 @@ export class ApiService {
     //   .get<any[]>(this.GATEWAY + this.API + this.COMBUSTIBLE_TYPES)
     //   .pipe(catchError((err) => throwError(err)));
     return of([
-      { name: 'No asignado', value: 0 },
+      { name: 'Sin asignar', value: 0 },
       { name: 'Gasolina', value: 1 },
       { name: 'Diesel', value: 2 },
       { name: 'Híbrido', value: 3 },
@@ -267,7 +268,7 @@ export class ApiService {
     //   .get<any[]>(this.GATEWAY + this.API + this.MANUFACTURERS)
     //   .pipe(catchError((err) => throwError(err)));
     return of([
-      { name: 'No asignado', value: 0 },
+      { name: 'Sin asignar', value: 0 },
       { name: 'Volkswagen', value: 1 },
       { name: 'Renault', value: 2 },
       { name: 'Yamaha', value: 3 },
@@ -282,11 +283,29 @@ export class ApiService {
     //   .get<any[]>(this.GATEWAY + this.API + this.TRANSMISSION_TYPES)
     //   .pipe(catchError((err) => throwError(err)));
     return of([
-      { name: 'No asignado', value: 0 },
+      { name: 'Sin asignar', value: 0 },
       { name: 'Manual', value: 1 },
       { name: 'Automática', value: 2 },
     ]);
   }
+
+  /**
+   * Get vehicle transmission options
+   */
+  getEnvironmentLabelTypes(): Observable<any[]> {
+    // return this.http
+    //   .get<any[]>(this.GATEWAY + this.API + this.ENVIRONMENT_LABEL_TYPES)
+    //   .pipe(catchError((err) => throwError(err)));
+    return of([
+      { name: 'Sin asignar', value: 0 },
+      { name: 'ZERO', value: 1 },
+      { name: 'ECO', value: 2 },
+      { name: 'B', value: 3 },
+      { name: 'C', value: 4 },
+      { name: 'D', value: 5 },
+    ]);
+  }
+
   /**
    * Save a new or edited vehicle
    * @param vehicle Vehicle
