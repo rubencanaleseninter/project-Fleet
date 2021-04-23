@@ -1,32 +1,32 @@
 [
   {
-    "codigoEmpleado": 1,
-    "nombreEmpleado": "Antonio",
-    "idVehiculo":["5964FVY"]
+    "employeeId": 1,
+    "employeeName": "Antonio",
+    "vehicleId": ["5964FVY"]
   },
   {
-    "codigoEmpleado": 2,
-    "nombreEmpleado": "Vicente",
-    "idVehiculo": ["3998JRT"]
+    "employeeId": 2,
+    "employeeName": "Vicente",
+    "vehicleId": ["3998JRT"]
   },
   {
-    "codigoEmpleado": 3,
-    "nombreEmpleado": "Manuel",
-    "idVehiculo": ["4021HRM"]
+    "employeeId": 3,
+    "employeeName": "Manuel",
+    "vehicleId": ["4021HRM"]
   },
   {
-    "codigoEmpleado": 4,
-    "nombreEmpleado": "Abdul",
-    "idVehiculo": ["2940KLM"]
+    "employeeId": 4,
+    "employeeName": "Abdul",
+    "vehicleId": ["2940KLM"]
   },
   {
-    "codigoEmpleado": 5,
-    "nombreEmpleado": "Joan",
-    "idVehiculo": ["3145BCD"]
+    "employeeId": 5,
+    "employeeName": "Joan",
+    "vehicleId": ["3145BCD"]
   },
   {
-    "codigoEmpleado": 6,
-    "nombreEmpleado": "Oriol",
-    "idVehiculo": []
+    "employeeId": 6,
+    "employeeName": "Oriol",
+    "vehicleId": []
   }
 ]

@@ -193,7 +193,7 @@ export class VehiclesTableComponent implements OnInit {
       },
       {
         field: 'employeeId',
-        header: 'Id Conductor',
+        header: 'Código empleado/a',
         type: 'input',
         disabled: false,
         required: false,

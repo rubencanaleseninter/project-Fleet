@@ -1,5 +1,7 @@
 export interface Driver {
-  codigoEmpleado?: number;
-  nombreEmpleado?: string;
-  idVehiculo?: number[];
+  employeeId?: number;
+  employeeName?: string;
+  vehicleId?: string[];
+  licenseType?: string;
+  licenseExpirationDate?: Date;
 }

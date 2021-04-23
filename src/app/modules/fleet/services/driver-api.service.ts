@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject, Observable, throwError, of } from 'rxjs';
-import { Driver } from '../models/driver.model';
 import { catchError } from 'rxjs/operators';
+import { Driver } from '../models/driver.model';
 
 @Injectable({
   providedIn: 'root',
@@ -105,9 +105,19 @@ export class DriverApiService {
    * @param id codeEmployee
    */
   getDriver(id: number): Observable<Driver> {
-    return this.http
-      .post<Driver>(this.GATEWAY + this.API + this.DRIVER, id)
-      .pipe(catchError((err) => throwError(err)));
+    // return this.http
+    //   .post<Driver>(this.GATEWAY + this.API + this.DRIVER, id)
+    //   .pipe(catchError((err) => throwError(err)));
+    return of(
+      Object.assign(
+        {
+          employeeId: 1,
+          employeeName: 'Antonio',
+          vehicleId: ['5964FVY'],
+        },
+        new Driver()
+      )
+    );
   }
 
   /**

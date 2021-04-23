@@ -128,7 +128,7 @@
 <p-dialog
   *ngIf="displayFormDriverModal"
   [header]="
-    formDriverGroup.controls.codigoEmpleado.value
+    formDriverGroup.controls.employeeId.value
       ? 'Editar conductor'
       : 'Nuevo conductor'
   "
@@ -152,6 +152,7 @@
           [formControlName]="col.field"
           [name]="col.field"
         />
+
         <p-multiSelect
           *ngIf="col.type === 'select'"
           styleClass="w-100"
@@ -161,6 +162,16 @@
           [options]="col.options"
           [formControlName]="col.field"
         ></p-multiSelect>
+
+        <p-calendar
+          *ngIf="col.type === 'date'"
+          styleClass="w-100"
+          dateFormat="dd.mm.yy"
+          [formControlName]="col.field"
+          [showButtonBar]="true"
+          [locale]="driverService.calendar.es"
+          [defaultDate]="driverService.calendar.today"
+        ></p-calendar>
       </div>
     </div>
   </form>
@@ -168,7 +179,7 @@
   <ng-template pTemplate="footer">
     <button
       type="button"
-      class="btn btn-danger"
+      class="btn btn-secondary"
       (click)="displayFormDriverModal = false"
     >
       Cancelar

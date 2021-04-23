@@ -87,22 +87,22 @@ export class DriversTableComponent implements OnInit {
   createDriverColumns(vehicleIds: any[]): void {
     this.driverCols = [
       {
-        field: 'codigoEmpleado',
-        header: 'Id Conductor',
+        field: 'employeeId',
+        header: 'Código empleado/a',
         type: 'input',
         disabled: true,
         required: false,
       },
       {
-        field: 'nombreEmpleado',
+        field: 'employeeName',
         header: 'Nombre',
         type: 'input',
         disabled: false,
         required: true,
       },
       {
-        field: 'idVehiculo',
-        header: 'Matrícula vehículo',
+        field: 'vehicleId',
+        header: 'Vehículo asignado',
         type: 'select',
         disabled: false,
         required: false,
@@ -123,8 +123,10 @@ export class DriversTableComponent implements OnInit {
    * @param rowData Driver
    */
   showDriverDetails(rowData: Driver): void {
-    this.driverService.selectedDriver = rowData;
-    this.displayDriverDetails = true;
+    this.driverService.getDriver(rowData.employeeId).subscribe((res) => {
+      this.driverService.selectedDriver = res;
+      this.displayDriverDetails = true;
+    });
   }
 
   /**
@@ -164,7 +166,7 @@ export class DriversTableComponent implements OnInit {
    * @param rowData Driver
    */
   removeDriver(rowData: Driver): void {
-    if (rowData.idVehiculo.length > 0) {
+    if (rowData.vehicleId.length > 0) {
       this.displayMessage(
         'error',
         'Este conductor tiene vehiculo asignado y no se puede eliminar'

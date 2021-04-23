@@ -1,26 +1,26 @@
 export class Driver {
-  private _codigoEmpleado!: number;
-  private _nombreEmpleado!: string;
-  private _idVehiculo!: string[];
+  private _employeeId!: number;
+  private _employeeName!: string;
+  private _vehicleId!: string[];
 
-  get codigoEmpleado(): number {
-    return this._codigoEmpleado;
+  get employeeId(): number {
+    return this._employeeId;
   }
-  set codigoEmpleado(value: number) {
-    this._codigoEmpleado = value;
-  }
-
-  get nombreEmpleado(): string {
-    return this._nombreEmpleado;
-  }
-  set nombreEmpleado(value: string) {
-    this._nombreEmpleado = value;
+  set employeeId(value: number) {
+    this._employeeId = value;
   }
 
-  get idVehiculo(): string[] {
-    return this._idVehiculo;
+  get employeeName(): string {
+    return this._employeeName;
   }
-  set idVehiculo(value: string[]) {
-    this._idVehiculo = value;
+  set employeeName(value: string) {
+    this._employeeName = value;
+  }
+
+  get vehicleId(): string[] {
+    return this._vehicleId;
+  }
+  set vehicleId(value: string[]) {
+    this._vehicleId = value;
   }
 }
