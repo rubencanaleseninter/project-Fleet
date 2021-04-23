@@ -1,0 +1,142 @@
+<div class="p-4" style="border: 1px solid yellow">
+  <button class="btn btn-primary m-4" (click)="showAddVehicle($event)">
+    Añadir vehículo
+  </button>
+
+  <div class="p-4">
+    <h4 class="pb-2">Vehículos</h4>
+    <p-table
+      #vehicleTable
+      [value]="vehicles"
+      [columns]="vehicleCols"
+      [rows]="3"
+      [(selection)]="selectedVehicle"
+      (onRowSelect)="showEditVehicle(selectedVehicle)"
+      [rowHover]="true"
+      [showCurrentPageReport]="true"
+      [paginator]="true"
+      dataKey="id"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    >
+      <ng-template pTemplate="caption">
+        <div class="row">
+          <div class="col-lg-5 col-md-12 col-sm-12">
+            <input
+              class="form-control"
+              type="search"
+              pInputText
+              placeholder="Buscar ..."
+              (input)="filterGlobal($event.target, vehicleTable)"
+            />
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th
+            *ngFor="let col of vehicleCols"
+            class="text-center"
+            [pSortableColumn]="col.field"
+          >
+            {{ col.header }}
+            <p-sortIcon
+              [field]="col.field"
+              ariaLabel="Activate to sort"
+              ariaLabelDesc="Activate to sort in descending order"
+              ariaLabelAsc="Activate to sort in ascending order"
+            ></p-sortIcon>
+          </th>
+          <th class="text-center"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowData let-columns="columns">
+        <tr [pSelectableRow]="rowData" (click)="showVehicleDetails(rowData)">
+          <td *ngFor="let col of columns" class="text-justify">
+            <span *ngIf="col.field === 'fechaalta'; else elseBlock">
+              {{ rowData[col.field] | date: "dd/MM/yyyy" }}
+            </span>
+            <ng-template #elseBlock>
+              <span
+                [ngStyle]="{
+                  'font-size': col.field === 'Observaciones' ? '0.9em' : ''
+                }"
+              >
+                {{ rowData[col.field] }}
+              </span>
+            </ng-template>
+          </td>
+          <td class="text-center">
+            <button
+              class="btn btn-outline-danger"
+              (click)="showEditVehicle(rowData); $event.stopPropagation()"
+            >
+              Editar
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- VEHICLE DIALOGS -->
+<p-dialog
+  header="Nuevo vehículo"
+  [(visible)]="displayAddVehicle"
+  [style]="{ width: '50vw' }"
+  [modal]="true"
+>
+  Añadir vehículo nuevo
+  <ng-template pTemplate="footer">
+    <button
+      type="button"
+      class="btn btn-danger"
+      (click)="displayAddVehicle = false"
+    >
+      Cancelar
+    </button>
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="closeRequests(); displayAddVehicle = false"
+    >
+      Guardar
+    </button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Editar vehículo"
+  [(visible)]="displayEditVehicle"
+  [style]="{ width: '50vw' }"
+  [modal]="true"
+>
+  Editar vehiculo
+  <ng-template pTemplate="footer">
+    <button
+      type="button"
+      class="btn btn-danger"
+      (click)="displayEditVehicle = false"
+    >
+      Cancelar
+    </button>
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="closeRequests(); displayEditVehicle = false"
+    >
+      Guardar
+    </button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Detalles del vehículo"
+  [(visible)]="displayVehicleDetails"
+  [dismissableMask]="true"
+  [style]="{ width: '50vw' }"
+  [modal]="true"
+>
+  Detalles del vehículo
+</p-dialog>

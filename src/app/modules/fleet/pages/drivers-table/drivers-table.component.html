@@ -1,0 +1,132 @@
+<div class="p-4" style="border: 1px solid blue">
+  <button class="btn btn-primary m-4" (click)="showAddDriver($event)">
+    Añadir Conductor
+  </button>
+
+  <div class="p-4">
+    <h4 class="pb-2">Conductores</h4>
+    <p-table
+      #driverTable
+      [scrollable]="true"
+      [value]="drivers"
+      [columns]="driverCols"
+      [rows]="10"
+      [(selection)]="selectedDriver"
+      [rowHover]="true"
+      [showCurrentPageReport]="true"
+      dataKey="id"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    >
+      <ng-template pTemplate="caption">
+        <div class="row">
+          <div class="col-lg-5 col-md-12 col-sm-12">
+            <input
+              class="form-control"
+              type="search"
+              pInputText
+              placeholder="Buscar ..."
+              (input)="filterGlobal($event.target, driverTable)"
+            />
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th
+            *ngFor="let col of driverCols"
+            class="text-center"
+            [pSortableColumn]="col.field"
+          >
+            {{ col.header }}
+            <p-sortIcon
+              [field]="col.field"
+              ariaLabel="Activate to sort"
+              ariaLabelDesc="Activate to sort in descending order"
+              ariaLabelAsc="Activate to sort in ascending order"
+            ></p-sortIcon>
+          </th>
+          <th class="text-center"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowData let-columns="columns">
+        <tr [pSelectableRow]="rowData" (click)="showDriverDetails(rowData)">
+          <td *ngFor="let col of columns" class="text-center">
+            {{ rowData[col.field] }}
+          </td>
+          <td class="text-center">
+            <button
+              class="btn btn-outline-danger"
+              (click)="showEditDriver(rowData); $event.stopPropagation()"
+            >
+              Editar
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- DRIVER DIALOGS -->
+<p-dialog
+  header="Nuevo conductor"
+  [(visible)]="displayAddDriver"
+  [style]="{ width: '50vw' }"
+  [modal]="true"
+>
+  Añadir conductor nuevo
+  <ng-template pTemplate="footer">
+    <button
+      type="button"
+      class="btn btn-danger"
+      (click)="displayAddDriver = false"
+    >
+      Cancelar
+    </button>
+    <button
+      type="button"
+      class="btn btn-success"
+      (click)="closeRequests(); displayAddDriver = false"
+    >
+      Guardar
+    </button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Editar conductor"
+  [(visible)]="displayEditDriver"
+  [style]="{ width: '50vw' }"
+  [modal]="true"
+>
+  Editar conductor
+  <ng-template pTemplate="footer">
+    <button
+      type="button"
+      class="btn btn-danger"
+      (click)="displayEditDriver = false"
+    >
+      Cancelar
+    </button>
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="closeRequests(); displayEditDriver = false"
+    >
+      Guardar
+    </button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Detalles del conductor"
+  [(visible)]="displayDriverDetails"
+  [dismissableMask]="true"
+  [closable]="true"
+  [closeOnEscape]="true"
+  [style]="{ width: '50vw' }"
+  [modal]="true"
+>
+  Detalles del conductor
+</p-dialog>
