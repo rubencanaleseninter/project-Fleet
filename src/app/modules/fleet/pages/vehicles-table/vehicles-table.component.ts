@@ -1,19 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { forkJoin } from 'rxjs';
+import { Columns } from '../../interfaces/columns';
+import { VehicleDto } from '../../interfaces/fleet.interface';
 import { Vehicle } from '../../models/fleet.model';
 import { VehicleApiService } from '../../services/vehicle-api.service';
-
-export interface Cols {
-  field: string;
-  header: string;
-  type?: string;
-  required?: boolean;
-  disabled?: boolean;
-  options?: any;
-  width?: string;
-}
 
 @Component({
   templateUrl: './vehicles-table.component.html',
@@ -21,12 +13,21 @@ export interface Cols {
 })
 export class VehiclesTableComponent implements OnInit {
   vehicleArray!: Vehicle[];
-  vehicleCols!: Cols[];
-  vehicleTableCols!: Cols[];
-  vehicleFilters!: string[];
-  displayVehicleDetails = false;
-  displayFormVehicleModal = false;
-  formVehicleGroup = new FormGroup({});
+  fields!: Columns[];
+  cols!: Columns[];
+  filters!: string[];
+  formGroup!: FormGroup;
+  displayDetails = false;
+  displayForm = false;
+  private _selectedCols!: Columns[];
+
+  @Input() get selectedCols(): any[] {
+    return this._selectedCols;
+  }
+
+  set selectedCols(val: any[]) {
+    this._selectedCols = this.cols.filter((col) => val.includes(col));
+  }
 
   constructor(
     public vehicleService: VehicleApiService,
@@ -50,6 +51,8 @@ export class VehiclesTableComponent implements OnInit {
     const manufacturerTypes$ = this.vehicleService.getManufacturers();
     const vehicleModels$ = this.vehicleService.getVehicleModels();
     const environmentLabelTypes$ = this.vehicleService.getEnvironmentLabelTypes();
+    const delegations$ = this.vehicleService.getDelegations();
+    const employees$ = this.vehicleService.getEmployees();
 
     forkJoin([
       vehicles$,
@@ -60,6 +63,8 @@ export class VehiclesTableComponent implements OnInit {
       manufacturerTypes$,
       vehicleModels$,
       environmentLabelTypes$,
+      delegations$,
+      employees$,
     ]).subscribe(
       ([
         vehicles,
@@ -70,21 +75,24 @@ export class VehiclesTableComponent implements OnInit {
         manufacturerTypes,
         vehicleModels,
         environmentLabelTypes,
+        delegations,
+        employees,
       ]) => {
         this.vehicleArray = vehicles;
-
-        this.createVehicleColums(
+        this.createFields(
           financingTypes,
           vehicleTypes,
           combustibleTypes,
           transmissionTypes,
           manufacturerTypes,
           vehicleModels,
-          environmentLabelTypes
+          environmentLabelTypes,
+          delegations,
+          employees
         );
-        this.createVehicleTableColums();
-        this.createVehicleFilters();
-        this.createVehicleForm();
+        this.createColums();
+        this.createFilters();
+        this.createForm();
       }
     );
   }
@@ -104,45 +112,55 @@ export class VehiclesTableComponent implements OnInit {
   /**
    * Create the vehicle forms modal
    */
-  createVehicleForm(): void {
-    this.formVehicleGroup = new FormGroup({});
-    this.vehicleCols.forEach((col) => {
-      this.formVehicleGroup.addControl(
-        col.field,
-        col.required
+  createForm(): void {
+    this.formGroup = new FormGroup({});
+    this.fields.forEach((f) => {
+      this.formGroup.addControl(
+        f.field,
+        f.required
           ? this.fb.control(
-              { value: null, disabled: col.disabled },
+              { value: null, disabled: f.disabled },
               Validators.required
             )
-          : this.fb.control({ value: null, disabled: col.disabled })
+          : this.fb.control({ value: null, disabled: f.disabled })
       );
     });
   }
 
   /**
-   * Create the columns of the tables
+   * Create form fields
    */
-  createVehicleColums(
+  createFields(
     financingTypes: any[],
     vehicleTypes: any[],
     combustibleTypes: any[],
     transmissionTypes: any[],
     manufacturerTypes: any[],
     vehicleModels: any[],
-    environmentLabelTypes: any[]
+    environmentLabelTypes: any[],
+    delegations: any[],
+    employees: any[]
   ): void {
-    this.vehicleCols = [
+    this.fields = [
+      // {
+      //   field: 'rowId',
+      //   header: 'Id',
+      //   type: 'input',
+      //   disabled: true,
+      //   required: false,
+      // },
       {
-        field: 'rowId',
-        header: 'Id',
-        type: 'input',
-        disabled: true,
-        required: false,
+        field: 'active',
+        header: '',
+        type: 'checkbox',
+        disabled: false,
+        required: true,
       },
       {
         field: 'plate',
         header: 'Matricula',
         type: 'input',
+        placeholder: 'requerido',
         disabled: false,
         required: true,
       },
@@ -150,6 +168,7 @@ export class VehiclesTableComponent implements OnInit {
         field: 'carframe',
         header: 'Bastidor',
         type: 'input',
+        placeholder: 'requerido',
         disabled: false,
         required: true,
       },
@@ -157,6 +176,7 @@ export class VehiclesTableComponent implements OnInit {
         field: 'manufacturerId',
         header: 'Marca',
         type: 'select',
+        placeholder: 'requerido',
         disabled: false,
         required: true,
         options: manufacturerTypes,
@@ -165,6 +185,7 @@ export class VehiclesTableComponent implements OnInit {
         field: 'modelId',
         header: 'Modelo',
         type: 'select',
+        placeholder: 'requerido',
         disabled: false,
         required: true,
         options: vehicleModels,
@@ -173,6 +194,7 @@ export class VehiclesTableComponent implements OnInit {
         field: 'financingTypeId',
         header: 'Tipo de financiación',
         type: 'select',
+        placeholder: 'requerido',
         disabled: false,
         required: true,
         options: financingTypes,
@@ -182,7 +204,7 @@ export class VehiclesTableComponent implements OnInit {
         header: 'Fecha de alta',
         type: 'date',
         disabled: false,
-        required: true,
+        required: false,
       },
       {
         field: 'leavingDate',
@@ -193,22 +215,26 @@ export class VehiclesTableComponent implements OnInit {
       },
       {
         field: 'employeeId',
-        header: 'Código empleado/a',
-        type: 'input',
+        header: 'Conductor',
+        type: 'select',
         disabled: false,
         required: false,
+        options: employees,
       },
       {
         field: 'assignedAtCompanyId',
-        header: 'Id empresa',
-        type: 'input',
+        header: 'Empresa',
+        type: 'select',
+        placeholder: 'requerido',
         disabled: false,
         required: true,
+        options: delegations,
       },
       {
         field: 'mileage',
         header: 'Kms actuales',
         type: 'input',
+        placeholder: 'requerido',
         disabled: false,
         required: true,
       },
@@ -216,6 +242,7 @@ export class VehiclesTableComponent implements OnInit {
         field: 'vehicleTypeId',
         header: 'Tipo de vehículo',
         type: 'select',
+        placeholder: 'requerido',
         disabled: false,
         required: true,
         options: vehicleTypes,
@@ -224,6 +251,7 @@ export class VehiclesTableComponent implements OnInit {
         field: 'fuelTypeId',
         header: 'Tipo de combustible',
         type: 'select',
+        placeholder: 'requerido',
         disabled: false,
         required: true,
         options: combustibleTypes,
@@ -232,6 +260,7 @@ export class VehiclesTableComponent implements OnInit {
         field: 'pollutingEmissions',
         header: 'Emisiones',
         type: 'input',
+        placeholder: 'g/km',
         disabled: false,
         required: false,
       },
@@ -239,6 +268,7 @@ export class VehiclesTableComponent implements OnInit {
         field: 'transmissionTypeId',
         header: 'Tipo de transmisión',
         type: 'select',
+        placeholder: 'requerido',
         disabled: false,
         required: true,
         options: transmissionTypes,
@@ -247,6 +277,7 @@ export class VehiclesTableComponent implements OnInit {
         field: 'financialCompanyId',
         header: 'Id financiera',
         type: 'input',
+        placeholder: 'requerido',
         disabled: false,
         required: true,
       },
@@ -254,6 +285,7 @@ export class VehiclesTableComponent implements OnInit {
         field: 'contractNumber',
         header: 'Nº de contrato',
         type: 'input',
+        placeholder: 'requerido',
         disabled: false,
         required: true,
       },
@@ -261,6 +293,7 @@ export class VehiclesTableComponent implements OnInit {
         field: 'maxMileage',
         header: 'Kms máximos',
         type: 'input',
+        placeholder: 'requerido',
         disabled: false,
         required: true,
       },
@@ -268,13 +301,7 @@ export class VehiclesTableComponent implements OnInit {
         field: 'monthlyFee',
         header: 'Cuota mensual',
         type: 'input',
-        disabled: false,
-        required: true,
-      },
-      {
-        field: 'active',
-        header: 'Estado',
-        type: 'checkbox',
+        placeholder: 'requerido',
         disabled: false,
         required: true,
       },
@@ -290,6 +317,7 @@ export class VehiclesTableComponent implements OnInit {
         field: 'fuelConsumption',
         header: 'Consumo',
         type: 'input',
+        placeholder: 'l/100Km',
         disabled: false,
         required: false,
       },
@@ -304,15 +332,15 @@ export class VehiclesTableComponent implements OnInit {
   }
 
   /**
-   * Create the columns of the tables
+   * Create the columns of the table
    */
-  createVehicleTableColums(): void {
-    this.vehicleTableCols = [
-      {
-        field: 'rowId',
-        header: 'Id',
-        width: '80px',
-      },
+  createColums(): void {
+    this.cols = [
+      // {
+      //   field: 'rowId',
+      //   header: 'Id',
+      //   width: '80px',
+      // },
       {
         field: 'plate',
         header: 'Matricula',
@@ -321,17 +349,17 @@ export class VehiclesTableComponent implements OnInit {
       {
         field: 'carframe',
         header: 'Bastidor',
-        width: '120px',
+        width: '180px',
       },
       {
         field: 'manufacturerName',
         header: 'Marca',
-        width: '220px',
+        width: '120px',
       },
       {
         field: 'modelName',
         header: 'Modelo',
-        width: '220px',
+        width: '180px',
       },
       {
         field: 'financingTypeName',
@@ -356,12 +384,13 @@ export class VehiclesTableComponent implements OnInit {
       {
         field: 'assignedAtCompanyName',
         header: 'Empresa',
-        width: '100px',
+        width: '120px',
       },
       {
         field: 'mileage',
         header: 'Kms actuales',
         width: '100px',
+        placeholder: 'kms',
       },
       {
         field: 'vehicleTypeName',
@@ -371,12 +400,13 @@ export class VehiclesTableComponent implements OnInit {
       {
         field: 'fuelTypeName',
         header: 'Tipo de combustible',
-        width: '100px',
+        width: '120px',
       },
       {
         field: 'pollutingEmissions',
         header: 'Emisiones',
         width: '100px',
+        placeholder: 'g/km',
       },
       {
         field: 'transmissionTypeName',
@@ -397,26 +427,29 @@ export class VehiclesTableComponent implements OnInit {
         field: 'maxMileage',
         header: 'Kms máximos',
         width: '100px',
+        placeholder: 'kms',
       },
       {
         field: 'monthlyFee',
         header: 'Cuota mensual',
         width: '100px',
+        placeholder: '€/mes',
       },
       {
         field: 'active',
         header: 'Estado',
-        width: '80px',
+        width: '100px',
       },
       {
         field: 'environmentLabelName',
-        header: 'Etiqueta medioambiental',
+        header: 'Etiqueta med.',
         width: '100px',
       },
       {
         field: 'fuelConsumption',
-        header: 'Consumo',
-        width: '80px',
+        header: 'Consumo l/100km',
+        width: '100px',
+        placeholder: 'l/100km',
       },
       {
         field: 'observations',
@@ -424,10 +457,11 @@ export class VehiclesTableComponent implements OnInit {
         width: '200px',
       },
     ];
+    this._selectedCols = this.cols;
   }
 
-  createVehicleFilters(): void {
-    this.vehicleFilters = this.vehicleCols.map((col) => col.field);
+  createFilters(): void {
+    this.filters = this.selectedCols.map((col) => col.field);
   }
 
   /**
@@ -435,8 +469,10 @@ export class VehiclesTableComponent implements OnInit {
    * @param rowData Vehicle
    */
   showVehicleDetails(rowData: Vehicle): void {
-    this.vehicleService.selectedVehicle = rowData;
-    this.displayVehicleDetails = true;
+    this.vehicleService.getVehicle(rowData.plate).subscribe((res) => {
+      this.vehicleService.selectedVehicle = res;
+      this.displayDetails = true;
+    });
   }
 
   /**
@@ -444,9 +480,9 @@ export class VehiclesTableComponent implements OnInit {
    * @param rowData Vehicle
    */
   showEditVehicle(rowData: Vehicle): void {
-    this.vehicleService.getVehicle(rowData.rowId).subscribe((res) => {
-      this.displayFormVehicleModal = true;
-      this.formVehicleGroup.patchValue(res);
+    this.vehicleService.getVehicleDto(rowData.plate).subscribe((res) => {
+      this.displayForm = true;
+      this.formGroup.patchValue(res);
     });
   }
 
@@ -454,20 +490,21 @@ export class VehiclesTableComponent implements OnInit {
    * Display add vehicle modal
    */
   showAddVehicle(): void {
-    this.formVehicleGroup.reset();
-    this.displayFormVehicleModal = true;
+    this.formGroup.reset();
+    this.displayForm = true;
   }
+
   /**
    * Save the vehicle form on edit or create new
    */
   saveVehicle(): void {
-    if (this.formVehicleGroup.invalid) {
+    if (this.formGroup.invalid) {
       this.displayMessage('error', 'Revise el formulario');
     } else {
-      let vehicle = Object.assign(this.formVehicleGroup.value, new Vehicle());
-      vehicle = this.formVehicleGroup.value;
+      let vehicle = Object.assign(this.formGroup.value, new Vehicle());
+      vehicle = this.formGroup.value;
       // FIXME: Call this.vehicleService.saveVehicle(vehicle).subscribe(()=>{this.displayEditVehicle = false;this.displayMessage('success', 'Vehículo guardado correctamente');});
-      this.displayFormVehicleModal = false;
+      this.displayForm = false;
       this.displayMessage('success', 'Vehículo guardado correctamente');
     }
   }
@@ -476,14 +513,14 @@ export class VehiclesTableComponent implements OnInit {
    * Remove the selected vehicle
    * @param rowData Vehicle
    */
-  removeVehicle(rowData: Vehicle): void {
+  removeVehicle(rowData: VehicleDto): void {
     if (rowData.active) {
       this.displayMessage(
         'error',
         'Este vehiculo se encuentra activo y no se puede eliminar'
       );
     } else {
-      // FIXME: Call this.vehicleService.deleteVehicle(rowData.rowId).subscribe(()=>{this.displayMessage('success', 'Vehículo eliminado correctamente');});
+      // FIXME: Call this.vehicleService.deleteVehicle(rowData.plate).subscribe(()=>{this.displayMessage('success', 'Vehículo eliminado correctamente');});
     }
   }
 }

@@ -111,14 +111,14 @@ export class VehicleApiService {
 
   /**
    * Get a specific vehicle
-   * @param id vehicle code
+   * @param id vehicle plate string
    */
-  getVehicle(id: number): Observable<VehicleDto> {
+  getVehicleDto(id: string): Observable<VehicleDto> {
     // return this.http
     //   .post<Vehicle>(this.GATEWAY + this.API + this.VEHICLE, id)
     //   .pipe(catchError((err) => throwError(err)));
     return of({
-      rowId: 1,
+      // rowId: 1,
       plate: '3145BCD',
       carframe: '0g896dh',
       modelId: 1,
@@ -126,7 +126,7 @@ export class VehicleApiService {
       financingTypeId: 1,
       entryDate: new Date(),
       leaveDate: undefined,
-      employeeId: 1,
+      employeeId: 11199,
       assignedAtCompanyId: 1,
       mileage: 5000,
       vehicleTypeId: 1,
@@ -141,6 +141,54 @@ export class VehicleApiService {
       environmentLabelId: 1,
       fuelConsumption: undefined,
       observations: 'Al coche fantástico no le funciona el Aire',
+      vehicleId: ['5964FVY'],
+    });
+  }
+
+  /**
+   * Get a specific vehicle
+   * @param id vehicle plate string
+   */
+  getVehicle(id: string): Observable<any> {
+    // return this.http
+    //   .post<Vehicle>(this.GATEWAY + this.API + this.VEHICLE, id)
+    //   .pipe(catchError((err) => throwError(err)));
+    return of({
+      rowId: 1,
+      plate: '5964FVY',
+      carframe: '0g896dh',
+      modelName: 'Polo 1.2',
+      manufacturerName: 'Volkswagen',
+      financingTypeName: 'Renting',
+      entryDate: new Date('01/01/2020'),
+      leavingDate: null,
+      employeeName: 'Pepe Domingo',
+      assignedAtCompanyName: 'Eninter - Central',
+      mileage: 5000,
+      vehicleTypeName: 'Turismo',
+      fuelTypeName: 'Gasolina',
+      pollutingEmissions: 150,
+      transmissionTypeName: 'Manual',
+      financialCompanyName: 'Cooltra',
+      contractNumber: 8,
+      maxMileage: 12000,
+      monthlyFee: 1250,
+      active: true,
+      environmentLabelName: 'C',
+      fuelConsumption: 5.4,
+      observations: 'Al coche fantástico no le funciona el Aire',
+      history: [
+        {
+          driver: '11199 - Rubén C',
+          startDate: '01/04/2021 08:30',
+          endDate: '',
+        },
+        {
+          driver: '10624 - Antonio P.',
+          startDate: '04/10/2020 08:00',
+          endDate: '30/03/2021 17:30',
+        },
+      ],
     });
   }
 
@@ -285,6 +333,39 @@ export class VehicleApiService {
   }
 
   /**
+   * Get companies list
+   */
+  getDelegations(): Observable<any[]> {
+    // return this.http
+    //   .get<any[]>(this.GATEWAY + this.API + this.DELEGATIONS)
+    //   .pipe(catchError((err) => throwError(err)));
+    return of([
+      { name: 'Sin asignar', value: 0 },
+      { name: 'Eninter - Central', value: 1 },
+      { name: 'Maninter', value: 2 },
+      { name: 'Serrot', value: 3 },
+      { name: 'Elevaragon', value: 4 },
+      { name: 'De Marco', value: 5 },
+    ]);
+  }
+
+  /**
+   * Get employees list
+   */
+  getEmployees(): Observable<any[]> {
+    // return this.http
+    //   .get<any[]>(this.GATEWAY + this.API + this.EMPLOYEES)
+    //   .pipe(catchError((err) => throwError(err)));
+    return of([
+      { name: 'Sin asignar', value: 0 },
+      { name: '11199 - Rubén C.', value: 11199 },
+      { name: '12345 - Gerónimo K.', value: 12345 },
+      { name: '9876 - Lina M.', value: 9876 },
+      { name: '4753 - Dorotea T.', value: 4753 },
+    ]);
+  }
+
+  /**
    * Save a new or edited vehicle
    * @param vehicle Vehicle
    */
@@ -296,7 +377,7 @@ export class VehicleApiService {
 
   /**
    * Delete the selected vehicle
-   * @param id string
+   * @param id vehicle plate string
    */
   deleteVehicle(id: string): Observable<any> {
     return this.http

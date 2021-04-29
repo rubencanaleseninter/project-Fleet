@@ -4,14 +4,14 @@
     *ngIf="vehicleArray; else vhTemplate"
     #vehicleTable
     [value]="vehicleArray"
-    [columns]="vehicleTableCols"
+    [columns]="selectedCols"
     [rows]="10"
     [(selection)]="vehicleService.selectedVehicle"
     (onRowSelect)="showEditVehicle(vehicleService.selectedVehicle)"
     [rowHover]="true"
     [showCurrentPageReport]="true"
     [paginator]="true"
-    [globalFilterFields]="vehicleFilters"
+    [globalFilterFields]="filters"
     [scrollable]="true"
     [style]="{ width: '100%' }"
     dataKey="id"
@@ -28,6 +28,17 @@
             placeholder="Buscar ..."
             (input)="vehicleTable.filterGlobal(searchVehicle.value, 'contains')"
           />
+        </div>
+
+        <div class="mx-3">
+          <p-multiSelect
+            [options]="cols"
+            [(ngModel)]="selectedCols"
+            optionLabel="header"
+            selectedItemsLabel="{0} columnas seleccionadas"
+            [style]="{ minWidth: '200px' }"
+            placeholder="Selecciona las columnas"
+          ></p-multiSelect>
         </div>
 
         <div class="col">
@@ -51,7 +62,7 @@
 
     <ng-template pTemplate="colgroup" let-columns>
       <colgroup>
-        <col *ngFor="let col of vehicleTableCols" [style.width]="col.width" />
+        <col *ngFor="let col of selectedCols" [style.width]="col.width" />
         <col style="width: 140px" />
       </colgroup>
     </ng-template>
@@ -59,7 +70,7 @@
     <ng-template pTemplate="header" let-columns>
       <tr>
         <th
-          *ngFor="let col of vehicleTableCols"
+          *ngFor="let col of selectedCols"
           class="text-center"
           [pSortableColumn]="col.field"
         >
@@ -89,23 +100,28 @@
 
     <ng-template pTemplate="body" let-rowData let-columns="columns">
       <tr (click)="showVehicleDetails(rowData)">
-        <td *ngFor="let col of columns" class="text-justify">
-          <span *ngIf="col.field === 'fechaalta'">
+        <td
+          *ngFor="let col of columns"
+          class="text-justify"
+          [ngSwitch]="col.field"
+        >
+          <span *ngSwitchCase="'entryDate'">
             {{ rowData[col.field] | date: "dd/MM/yyyy" }}
           </span>
-
-          <span *ngIf="col.field === 'active'; else elseBlock">
+          <span *ngSwitchCase="'leavingDate'">
+            {{ rowData[col.field] | date: "dd/MM/yyyy" }}
+          </span>
+          <span *ngSwitchCase="'active'">
             {{ rowData[col.field] ? "Activo" : "Inactivo" }}
           </span>
-          <ng-template #elseBlock>
-            <span
-              [ngStyle]="{
-                'font-size': col.field === 'Observaciones' ? '0.9em' : ''
-              }"
-            >
-              {{ rowData[col.field] }}
-            </span>
-          </ng-template>
+          <span
+            *ngSwitchDefault
+            [ngStyle]="{
+              'font-size': col.field === 'Observaciones' ? '0.9em' : ''
+            }"
+          >
+            {{ rowData[col.field] }}
+          </span>
         </td>
         <td class="text-center">
           <button
@@ -142,51 +158,57 @@
       </tr>
     </ng-template>
   </p-table>
-  
+
   <!-- LOADER -->
   <ng-template #vhTemplate>
     <app-skeleton-table #vhTemplate></app-skeleton-table>
   </ng-template>
 </div>
 
-
 <!-- FORM VEHICLE DIALOG -->
 <p-dialog
-  *ngIf="displayFormVehicleModal"
+  *ngIf="displayForm"
   [header]="
-    formVehicleGroup.controls.rowId.value ? 'Editar vehículo' : 'Nuevo vehículo'
+    formGroup.controls.plate.value ? 'Editar vehículo' : 'Nuevo vehículo'
   "
-  [(visible)]="displayFormVehicleModal"
+  [(visible)]="displayForm"
   [style]="{ width: '50vw' }"
   [modal]="true"
 >
-  <form [formGroup]="formVehicleGroup">
-    <div *ngFor="let col of vehicleCols" class="row">
+  <form [formGroup]="formGroup" class="form">
+    <div *ngFor="let col of fields">
       <label [for]="col.field">{{ col.header }} </label>
-      <div class="col-lg-6 col-md-9 col-sm-12 mt-2 mb-4">
+      <div class="col-lg-6 col-md-9 col-sm-12 mb-4 px-0">
         <input
           *ngIf="col.type === 'input'"
           class="form-control"
           [class.invalid]="
-            this.formVehicleGroup.controls[col.field].touched &&
-            this.formVehicleGroup.controls[col.field].invalid
+            this.formGroup.controls[col.field].touched &&
+            this.formGroup.controls[col.field].invalid
           "
           [class.valid]="
-            this.formVehicleGroup.controls[col.field].touched &&
-            this.formVehicleGroup.controls[col.field].valid
+            this.formGroup.controls[col.field].touched &&
+            this.formGroup.controls[col.field].valid
           "
           [formControlName]="col.field"
           [formControlName]="col.field"
           [name]="col.field"
+          [placeholder]="col.placeholder ? col.placeholder : ''"
         />
+
         <p-dropdown
           *ngIf="col.type === 'select'"
           styleClass="w-100"
           optionLabel="name"
           optionValue="value"
-          placeholder="Selecciona una opción"
+          [placeholder]="
+            col.placeholder ? col.placeholder : 'Seleccione una opción'
+          "
           [options]="col.options"
           [formControlName]="col.field"
+          [showClear]="true"
+          [filter]="true"
+          filterBy="name"
         ></p-dropdown>
 
         <textarea
@@ -197,10 +219,20 @@
           [formControlName]="col.field"
         ></textarea>
 
-        <p-inputSwitch
-          *ngIf="col.type === 'checkbox'"
-          [formControlName]="col.field"
-        ></p-inputSwitch>
+        <div *ngIf="col.type === 'checkbox'" class="d-flex">
+          <p-inputSwitch
+            [formControlName]="col.field"
+            [disabled]="
+              formGroup.controls.employeeId.value &&
+              formGroup.controls.active.value
+            "
+          ></p-inputSwitch>
+          <span class="mx-3">
+            {{
+              this.formGroup.controls[col.field].value ? "Activo" : "Inactivo"
+            }}
+          </span>
+        </div>
 
         <p-calendar
           *ngIf="col.type === 'date'"
@@ -219,14 +251,14 @@
     <button
       type="button"
       class="btn btn-secondary"
-      (click)="displayFormVehicleModal = false"
+      (click)="displayForm = false"
     >
       Cancelar
     </button>
     <button
       type="button"
       class="btn btn-primary"
-      [disabled]="formVehicleGroup.invalid"
+      [disabled]="formGroup.invalid"
       (click)="saveVehicle()"
     >
       Guardar
@@ -234,24 +266,169 @@
   </ng-template>
 </p-dialog>
 
-<!-- VEHICLE DETAIL DIALOG -->
+<!-- VEHICLE DETAILS DIALOG -->
 <p-dialog
-  header="Detalles del vehículo"
-  [(visible)]="displayVehicleDetails"
+  *ngIf="vehicleService.selectedVehicle"
+  header=" "
+  [(visible)]="displayDetails"
   [dismissableMask]="true"
+  [closable]="true"
   [style]="{ width: '50vw' }"
   [modal]="true"
 >
-  <div *ngFor="let col of vehicleTableCols">
-    <b>{{ col.header }}: </b>
-    <span *ngIf="vehicleService.selectedVehicle">
-      <span *ngIf="col.field != 'active'">
-        {{ vehicleService.selectedVehicle[col.field] }}
-      </span>
-      <span *ngIf="col.field === 'active'">
-        {{ vehicleService.selectedVehicle[col.field] ? "Activo" : "Inactivo" }}
-      </span>
-    </span>
+  <div class="container-fluid p-0">
+    <!-- TITLE -->
+    <div class="title p-1 pl-4 my-auto">
+      <b>{{ vehicleService.selectedVehicle.plate }}</b>
+      <br />
+      <b>{{ vehicleService.selectedVehicle.manufacturerName }} </b>
+      <b>{{ vehicleService.selectedVehicle.modelName }}</b>
+    </div>
+    <!-- INFO -->
+    <hr />
+    <div class="row">
+      <div class="info-container col-6">
+        <div class="col-12">
+          <div class="d-flex">
+            <b>Estado</b>
+            <span
+              class="d-flex align-items-center justify-content-center mx-2 my-auto p-1 rounded-circle text-white badge bg-{{
+                vehicleService.selectedVehicle.active ? 'success' : 'danger'
+              }}"
+              [pTooltip]="
+                vehicleService.selectedVehicle.active ? 'Activo' : 'Inactivo'
+              "
+              tooltipPosition="top"
+            >
+              <i
+                *ngIf="vehicleService.selectedVehicle.active"
+                class="fas fa-check"
+              ></i>
+              <i
+                *ngIf="!vehicleService.selectedVehicle.active"
+                class="fas fa-times"
+              ></i>
+            </span>
+          </div>
+          <div>
+            <b>Conductor</b>
+            <span>
+              {{
+                vehicleService.selectedVehicle.employeeName
+                  ? vehicleService.selectedVehicle.employeeName
+                  : "Sin asignar"
+              }}
+            </span>
+          </div>
+        </div>
+
+        <div class="col-12 my-3">
+          <div>
+            <b>Fecha de alta</b>
+            {{ vehicleService.selectedVehicle.entryDate | date: "dd/MM/yyyy" }}
+          </div>
+          <div>
+            <b>Fecha de baja</b>
+            {{
+              vehicleService.selectedVehicle.leavingDate | date: "dd/MM/yyyy"
+            }}
+          </div>
+        </div>
+
+        <div class="col-12 my-3">
+          <div>
+            <b>Tipo de vehículo</b>
+            {{ vehicleService.selectedVehicle.vehicleTypeName }}
+          </div>
+          <div>
+            <b>Combustible</b>
+            {{ vehicleService.selectedVehicle.fuelTypeName }}
+          </div>
+          <div>
+            <b>Transmissión</b>
+            {{ vehicleService.selectedVehicle.transmissionTypeName }}
+          </div>
+          <div>
+            <b>Consumo</b>
+            {{ vehicleService.selectedVehicle.fuelConsumption }}
+            <span>&nbsp;l/100km</span>
+          </div>
+          <div>
+            <b>Emisiones</b>
+            {{ vehicleService.selectedVehicle.pollutingEmissions }}
+            <span>&nbsp;g/km</span>
+          </div>
+        </div>
+
+        <div class="col-12 my-3">
+          <div>
+            <b>Financiera</b>
+            {{ vehicleService.selectedVehicle.financialCompanyName }}
+          </div>
+          <div>
+            <b>Tipo de financiación</b>
+            {{ vehicleService.selectedVehicle.financingTypeName }}
+          </div>
+          <div>
+            <b>Número de contrato</b>
+            {{ vehicleService.selectedVehicle.contractNumber }}
+          </div>
+          <div>
+            <b>Cuota mensual</b>
+            {{ vehicleService.selectedVehicle.monthlyFee }}
+            <span>&nbsp;€</span>
+          </div>
+          <div>
+            <b>Kms máximos</b>
+            {{ vehicleService.selectedVehicle.maxMileage }}
+          </div>
+        </div>
+
+        <div class="col-12 mt-3">
+          <div>
+            <b>Delegación</b>
+            {{ vehicleService.selectedVehicle.assignedAtCompanyName }}
+          </div>
+          <div>
+            <b>Kilometraje</b>
+            {{ vehicleService.selectedVehicle.mileage }}
+          </div>
+          <div>
+            <b>Bastidor</b>
+            {{ vehicleService.selectedVehicle.carframe }}
+          </div>
+          <div>
+            <b>Observaciones</b>
+            {{ vehicleService.selectedVehicle.observations }}
+          </div>
+        </div>
+      </div>
+      <div class="col-6">
+        <b>Histórico de conductores</b>
+        <div class="card p-3 mt-3 overflow-auto">
+          <p-timeline
+            *ngIf="
+              vehicleService.selectedVehicle?.history;
+              else noEventsTemplate
+            "
+            [value]="vehicleService.selectedVehicle.history"
+          >
+            <ng-template pTemplate="content" let-event>
+              <small class="p-text-secondary"
+                >{{ event.startDate }} - {{ event.endDate }}</small
+              >
+            </ng-template>
+            <ng-template pTemplate="opposite" let-event>
+              <i class="fas fa-car mr-1"></i>
+              {{ event.driver }}
+            </ng-template>
+          </p-timeline>
+          <ng-template #noEventsTemplate>
+            <span>No se han obtenido registros para este vehículo</span>
+          </ng-template>
+        </div>
+      </div>
+    </div>
   </div>
 </p-dialog>
 

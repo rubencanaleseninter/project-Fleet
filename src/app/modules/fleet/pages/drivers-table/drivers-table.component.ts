@@ -2,19 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { forkJoin } from 'rxjs';
+import { Columns } from '../../interfaces/columns';
 import { Driver } from '../../models/driver.model';
 import { DriverApiService } from '../../services/driver-api.service';
 import { VehicleApiService } from '../../services/vehicle-api.service';
-
-export interface Cols {
-  field: string;
-  header: string;
-  type?: string;
-  required?: boolean;
-  disabled?: boolean;
-  options?: any;
-  width?: string;
-}
 
 @Component({
   templateUrl: './drivers-table.component.html',
@@ -22,11 +13,11 @@ export interface Cols {
 })
 export class DriversTableComponent implements OnInit {
   driverArray!: Driver[];
-  driverCols!: any[];
-  driverFilters!: string[];
-  displayDriverDetails = false;
-  displayFormDriverModal = false;
-  formDriverGroup = new FormGroup({});
+  cols!: Columns[];
+  filters!: string[];
+  displayDetails = false;
+  displayForm = false;
+  formGroup = new FormGroup({});
 
   constructor(
     public vehicleService: VehicleApiService,
@@ -48,9 +39,9 @@ export class DriversTableComponent implements OnInit {
 
     forkJoin([drivers$, vehicleIds$]).subscribe(([drivers, vehicleIds]) => {
       this.driverArray = drivers;
-      this.createDriverColumns(vehicleIds);
-      this.createDriverFilters();
-      this.createDriverForm();
+      this.createColumns(vehicleIds);
+      this.createFilters();
+      this.createForm();
     });
   }
 
@@ -69,10 +60,10 @@ export class DriversTableComponent implements OnInit {
   /**
    * Create the driver forms modal
    */
-  createDriverForm(): void {
-    this.formDriverGroup = new FormGroup({});
-    this.driverCols.forEach((col) =>
-      this.formDriverGroup.addControl(
+  createForm(): void {
+    this.formGroup = new FormGroup({});
+    this.cols.forEach((col) =>
+      this.formGroup.addControl(
         col.field,
         col.required
           ? this.fb.control(
@@ -84,11 +75,11 @@ export class DriversTableComponent implements OnInit {
     );
   }
 
-  createDriverColumns(vehicleIds: any[]): void {
-    this.driverCols = [
+  createColumns(vehicleIds: any[]): void {
+    this.cols = [
       {
         field: 'employeeId',
-        header: 'Código empleado/a',
+        header: 'Código de empleado',
         type: 'input',
         disabled: true,
         required: false,
@@ -114,8 +105,8 @@ export class DriversTableComponent implements OnInit {
   /**
    * Create field filters
    */
-  createDriverFilters(): void {
-    this.driverFilters = this.driverCols.map((col) => col.field);
+  createFilters(): void {
+    this.filters = this.cols.map((col) => col.field);
   }
 
   /**
@@ -125,7 +116,7 @@ export class DriversTableComponent implements OnInit {
   showDriverDetails(rowData: Driver): void {
     this.driverService.getDriver(rowData.employeeId).subscribe((res) => {
       this.driverService.selectedDriver = res;
-      this.displayDriverDetails = true;
+      this.displayDetails = true;
     });
   }
 
@@ -133,8 +124,11 @@ export class DriversTableComponent implements OnInit {
    * Display add driver modal
    */
   showAddDriver(): void {
-    this.formDriverGroup.reset();
-    this.displayFormDriverModal = true;
+    if (this.formGroup.controls.employeeId.disabled) {
+      this.formGroup.controls.employeeId.enable();
+    }
+    this.formGroup.reset();
+    this.displayForm = true;
   }
 
   /**
@@ -142,21 +136,24 @@ export class DriversTableComponent implements OnInit {
    * @param rowData Driver
    */
   showEditDriver(rowData: Driver): void {
-    this.displayFormDriverModal = true;
-    this.formDriverGroup.patchValue(rowData);
+    this.displayForm = true;
+    this.formGroup.patchValue(rowData);
+    if (this.formGroup.controls.employeeId.enabled) {
+      this.formGroup.controls.employeeId.disable();
+    }
   }
 
   /**
    * Save the driver form on edit or create new
    */
   saveDriver(): void {
-    if (this.formDriverGroup.invalid) {
+    if (this.formGroup.invalid) {
       this.displayMessage('error', 'Revise el formulario');
     } else {
       let driver = new Driver();
-      driver = this.formDriverGroup.value;
+      driver = this.formGroup.value;
       // FIXME: Call this.driverService.saveDriver(driver).subscribe(()=>{this.displayEditDriver = false;this.displayMessage('success', 'Conductor guardado correctamente');});
-      this.displayFormDriverModal = false;
+      this.displayForm = false;
       this.displayMessage('success', 'Conductor guardado correctamente');
     }
   }

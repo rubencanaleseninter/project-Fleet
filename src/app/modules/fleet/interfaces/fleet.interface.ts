@@ -32,6 +32,7 @@ export interface VehicleDto {
   manufacturerId?: number;
   financingTypeId?: number;
   entryDate?: Date;
+  leavingDate?: Date;
   employeeId?: number;
   assignedAtCompanyId?: number;
   mileage?: number;

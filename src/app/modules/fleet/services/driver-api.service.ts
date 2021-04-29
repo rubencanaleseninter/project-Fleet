@@ -114,6 +114,23 @@ export class DriverApiService {
           employeeId: 1,
           employeeName: 'Antonio',
           vehicleId: ['5964FVY'],
+          history: [
+            {
+              vehicle: '5964FVY - Ford Fiesta',
+              startDate: '01/04/2021 08:30',
+              endDate: '',
+            },
+            {
+              vehicle: '3834LKM - Volkswagen Polo',
+              startDate: '01/01/2021 14:00',
+              endDate: '30/03/2021 17:30',
+            },
+            {
+              vehicle: '9127HSD - Yamaha Tricity',
+              startDate: '15/10/2020 16:15',
+              endDate: '30/10/2020 10:30',
+            },
+          ],
         },
         new Driver()
       )

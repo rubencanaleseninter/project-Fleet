@@ -4,7 +4,7 @@
     *ngIf="driverArray; else drTemplate"
     #driverTable
     [value]="driverArray"
-    [columns]="driverCols"
+    [columns]="cols"
     [rows]="10"
     [(selection)]="driverService.selectedDriver"
     [rowHover]="true"
@@ -12,7 +12,7 @@
     [paginator]="true"
     dataKey="id"
     currentPageReportTemplate="Mostrando {first} - {last} de {totalRecords} vehículos"
-    [globalFilterFields]="driverFilters"
+    [globalFilterFields]="filters"
   >
     <ng-template pTemplate="caption">
       <div class="row">
@@ -49,7 +49,7 @@
     <ng-template pTemplate="header" let-columns>
       <tr>
         <th
-          *ngFor="let col of driverCols"
+          *ngFor="let col of cols"
           class="text-center"
           [pSortableColumn]="col.field"
         >
@@ -126,28 +126,26 @@
 
 <!-- FORM DRIVER DIALOG -->
 <p-dialog
-  *ngIf="displayFormDriverModal"
+  *ngIf="displayForm"
   [header]="
-    formDriverGroup.controls.employeeId.value
-      ? 'Editar conductor'
-      : 'Nuevo conductor'
+    formGroup.controls.employeeId.value ? 'Editar conductor' : 'Nuevo conductor'
   "
   [style]="{ width: '50vw' }"
   [modal]="true"
-  [(visible)]="displayFormDriverModal"
+  [(visible)]="displayForm"
 >
-  <form [formGroup]="formDriverGroup" class="form">
-    <div *ngFor="let col of driverCols">
+  <form [formGroup]="formGroup" class="form">
+    <div *ngFor="let col of cols">
       <label [for]="col.field">{{ col.header }} </label>
-      <div class="col-lg-6 col-md-9 col-sm-12 mt-2 mb-4">
+      <div class="col-lg-6 col-md-9 col-sm-12 mb-4 px-0">
         <input
           *ngIf="col.type === 'input'"
           class="form-control"
           [class.invalid]="
-            this.formDriverGroup.controls[col.field].touched &&
-            this.formDriverGroup.controls[col.field].invalid
+            this.formGroup.controls[col.field].touched &&
+            this.formGroup.controls[col.field].invalid
           "
-          [class.valid]="this.formDriverGroup.controls[col.field].valid"
+          [class.valid]="this.formGroup.controls[col.field].valid"
           [formControlName]="col.field"
           [formControlName]="col.field"
           [name]="col.field"
@@ -180,14 +178,14 @@
     <button
       type="button"
       class="btn btn-secondary"
-      (click)="displayFormDriverModal = false"
+      (click)="displayForm = false"
     >
       Cancelar
     </button>
     <button
       type="button"
       class="btn btn-primary"
-      [disabled]="formDriverGroup.invalid"
+      [disabled]="formGroup.invalid"
       (click)="saveDriver()"
     >
       Guardar
@@ -198,18 +196,40 @@
 <!-- DRIVER DETAIL DIALOG -->
 <p-dialog
   header="Detalles del conductor"
-  [(visible)]="displayDriverDetails"
+  [(visible)]="displayDetails"
   [dismissableMask]="true"
   [closable]="true"
   [closeOnEscape]="true"
   [style]="{ width: '50vw' }"
   [modal]="true"
 >
-  <div *ngFor="let col of driverCols">
+  <div *ngFor="let col of cols">
     <b>{{ col.header }}: </b>
     <span *ngIf="driverService.selectedDriver">{{
       driverService.selectedDriver[col.field]
     }}</span>
+  </div>
+  <div class="my-3">
+    <h5 class="py-3">Historial de vehículos</h5>
+    <div class="card p-3 overflow-auto">
+      <p-timeline
+        *ngIf="driverService.selectedDriver?.history; else noEventsTemplate"
+        [value]="driverService.selectedDriver.history"
+      >
+        <ng-template pTemplate="content" let-event>
+          <small class="p-text-secondary"
+            >{{ event.startDate }} - {{ event.endDate }}</small
+          >
+        </ng-template>
+        <ng-template pTemplate="opposite" let-event>
+          <i class="fas fa-user mr-1"></i>
+          {{ event.vehicle }}
+        </ng-template>
+      </p-timeline>
+      <ng-template #noEventsTemplate>
+        <span>No se han obtenido registros para este empleado</span>
+      </ng-template>
+    </div>
   </div>
 </p-dialog>
 

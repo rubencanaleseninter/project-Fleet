@@ -1,0 +1,170 @@
+<div class="p-4">
+  <h4 class="pb-2">Histórico</h4>
+  <p-table
+    *ngIf="vehicleArray; else vhTemplate"
+    #vehicleTable
+    [value]="vehicleArray"
+    [columns]="selectedCols"
+    [rows]="10"
+    [rowHover]="true"
+    [showCurrentPageReport]="true"
+    [paginator]="true"
+    [globalFilterFields]="filters"
+    [scrollable]="true"
+    [style]="{ width: '100%' }"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando {first} - {last} de {totalRecords} vehículos"
+  >
+    <ng-template pTemplate="caption">
+      <div class="row">
+        <div class="col-lg-4 col-md-8 col-sm-12">
+          <input
+            #searchVehicle
+            class="form-control"
+            type="search"
+            pInputText
+            placeholder="Buscar ..."
+            (input)="vehicleTable.filterGlobal(searchVehicle.value, 'contains')"
+          />
+        </div>
+        <div class="mx-3 w-340">
+          <p-multiSelect
+            [options]="cols"
+            [(ngModel)]="selectedCols"
+            optionLabel="header"
+            selectedItemsLabel="{0} columnas seleccionadas"
+            [style]="{ minWidth: '200px' }"
+            styleClass="w-100"
+            placeholder="Selecciona las columnas"
+          ></p-multiSelect>
+        </div>
+        <div class="mx-3 w-340">
+          <p-calendar
+            [(ngModel)]="rangeDates"
+            [readonlyInput]="true"
+            [minDate]="minDate"
+            [maxDate]="maxDate"
+            [showButtonBar]="true"
+            (ngModelChange)="
+              vehicleTable.filterGlobal($event.value, 'contains')
+            "
+            styleClass="w-100"
+            selectionMode="range"
+            inputId="range"
+            placeholder="Rango de fechas"
+          ></p-calendar>
+        </div>
+
+        <div>
+          <button
+            type="button"
+            pButton
+            pRipple
+            class="p-button-success mx-4"
+            icon="pi pi-file-excel"
+            (click)="vehicleTable.exportCSV()"
+            pTooltip="Exportar tabla csv"
+            tooltipPosition="bottom"
+          ></button>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="colgroup" let-columns>
+      <colgroup>
+        <col *ngFor="let col of selectedCols" [style.width]="col.width" />
+      </colgroup>
+    </ng-template>
+
+    <ng-template pTemplate="header" let-columns>
+      <tr>
+        <th
+          *ngFor="let col of selectedCols"
+          class="text-center"
+          [pSortableColumn]="col.field"
+        >
+          {{ col.header }}
+          <p-sortIcon
+            [field]="col.field"
+            ariaLabel="Activate to sort"
+            ariaLabelDesc="Activate to sort in descending order"
+            ariaLabelAsc="Activate to sort in ascending order"
+          ></p-sortIcon>
+          <p-columnFilter
+            type="text"
+            [field]="col.field"
+            display="menu"
+            [showMatchModes]="true"
+            [showAddButton]="false"
+            [showOperator]="false"
+          >
+            <ng-template pTemplate="header">
+              <h6 class="px-4 pt-3">{{ col.header }}</h6>
+            </ng-template>
+          </p-columnFilter>
+        </th>
+        <th class="text-center"></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-rowData let-columns="columns">
+      <tr (click)="showDetails(rowData)">
+        <td
+          *ngFor="let col of columns"
+          class="text-justify"
+          [ngSwitch]="col.field"
+        >
+          <span *ngSwitchCase="'entryDate'">
+            {{ rowData[col.field] | date: "dd/MM/yyyy" }}
+          </span>
+          <span *ngSwitchCase="'leavingDate'">
+            {{ rowData[col.field] | date: "dd/MM/yyyy" }}
+          </span>
+          <span *ngSwitchCase="'active'">
+            {{ rowData[col.field] ? "Activo" : "Inactivo" }}
+          </span>
+          <span
+            *ngSwitchDefault
+            [ngStyle]="{
+              'font-size': col.field === 'Observaciones' ? '0.9em' : ''
+            }"
+          >
+            {{ rowData[col.field] }}
+          </span>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage" let-columns>
+      <tr>
+        <td [attr.colspan]="columns.length">No se han obtenido resultados</td>
+      </tr>
+    </ng-template>
+  </p-table>
+  <!-- LOADER -->
+  <ng-template #vhTemplate>
+    <app-skeleton-table #vhTemplate></app-skeleton-table>
+  </ng-template>
+</div>
+
+<!-- VEHICLE DETAIL DIALOG -->
+<p-dialog
+  header=" "
+  [(visible)]="displayDetails"
+  [dismissableMask]="true"
+  [style]="{ width: '50vw' }"
+  [modal]="true"
+>
+  <div *ngFor="let col of cols">
+    <b>{{ col.header }}: </b>
+    <span *ngIf="selectedVehicle">
+      <span *ngIf="col.field != 'active'">
+        {{ selectedVehicle[col.field] }}
+      </span>
+      <span *ngIf="col.field === 'active'">
+        {{ selectedVehicle[col.field] ? "Activo" : "Inactivo" }}
+      </span>
+      <span *ngIf="col.placeholder">{{ col.placeholder }}</span>
+    </span>
+  </div>
+</p-dialog>

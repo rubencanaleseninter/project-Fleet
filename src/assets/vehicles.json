@@ -7,8 +7,9 @@
     "manufacturerName": "Volkswagen",
     "financingTypeName": "Renting",
     "entryDate": null,
+    "leavingDate": null,
     "employeeName": "Pepe Domingo",
-    "assignedAtCompanyName": "Eninter",
+    "assignedAtCompanyName": "Eninter - Central",
     "mileage": null,
     "vehicleTypeName": "Turismo",
     "fuelTypeName": "Gasolina",
@@ -20,7 +21,7 @@
     "monthlyFee": 1250,
     "active": true,
     "environmentLabelName": "C",
-    "fuelConsumption": null,
+    "fuelConsumption": 5.4,
     "observations": "Al coche fantástico no le funciona el Aire"
   },
   {
@@ -31,8 +32,9 @@
     "manufacturerName": "Volkswagen",
     "financingTypeName": "Renting",
     "entryDate": null,
+    "leavingDate": null,
     "employeeName": "Pepe Domingo",
-    "assignedAtCompanyName": "Eninter",
+    "assignedAtCompanyName": "Eninter - Central",
     "mileage": null,
     "vehicleTypeName": "Turismo",
     "fuelTypeName": "Gasolina",
@@ -44,7 +46,7 @@
     "monthlyFee": 1250,
     "active": true,
     "environmentLabelName": "C",
-    "fuelConsumption": null,
+    "fuelConsumption": 5.4,
     "observations": "Al coche fantástico no le funciona el Aire"
   },
   {
@@ -55,8 +57,9 @@
     "manufacturerName": "Volkswagen",
     "financingTypeName": "Renting",
     "entryDate": null,
+    "leavingDate": null,
     "employeeName": "Pepe Domingo",
-    "assignedAtCompanyName": "Eninter",
+    "assignedAtCompanyName": "Eninter - Central",
     "mileage": null,
     "vehicleTypeName": "Turismo",
     "fuelTypeName": "Gasolina",
@@ -68,7 +71,7 @@
     "monthlyFee": 1250,
     "active": true,
     "environmentLabelName": "C",
-    "fuelConsumption": null,
+    "fuelConsumption": 5.4,
     "observations": "Al coche fantástico no le funciona el Aire"
   },
   {
@@ -79,8 +82,9 @@
     "manufacturerName": "Volkswagen",
     "financingTypeName": "Renting",
     "entryDate": null,
+    "leavingDate": null,
     "employeeName": "Pepe Domingo",
-    "assignedAtCompanyName": "Eninter",
+    "assignedAtCompanyName": "Eninter - Central",
     "mileage": null,
     "vehicleTypeName": "Turismo",
     "fuelTypeName": "Gasolina",
@@ -92,7 +96,7 @@
     "monthlyFee": 1250,
     "active": true,
     "environmentLabelName": "C",
-    "fuelConsumption": null,
+    "fuelConsumption": 5.4,
     "observations": "Al coche fantástico no le funciona el Aire"
   },
   {
@@ -103,8 +107,9 @@
     "manufacturerName": "Volkswagen",
     "financingTypeName": "Renting",
     "entryDate": null,
+    "leavingDate": null,
     "employeeName": "Pepe Domingo",
-    "assignedAtCompanyName": "Eninter",
+    "assignedAtCompanyName": "Eninter - Central",
     "mileage": null,
     "vehicleTypeName": "Turismo",
     "fuelTypeName": "Gasolina",
@@ -116,7 +121,7 @@
     "monthlyFee": 1250,
     "active": true,
     "environmentLabelName": "C",
-    "fuelConsumption": null,
+    "fuelConsumption": 5.4,
     "observations": "Al coche fantástico no le funciona el Aire"
   }
 ]

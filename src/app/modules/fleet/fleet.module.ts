@@ -5,6 +5,9 @@ import { FleetComponent } from './pages/fleet.component';
 import { VehiclesTableComponent } from './pages/vehicles-table/vehicles-table.component';
 import { DriversTableComponent } from './pages/drivers-table/drivers-table.component';
 import { SkeletonTableComponent } from 'src/app/shared/components/skeleton-table/skeleton-table.component';
+import { VehiclesHistoryComponent } from './pages/vehicles-history/vehicles-history.component';
+
+import { FilterService, MessageService } from 'primeng/api';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -18,10 +21,10 @@ import { MessagesModule } from 'primeng/messages';
 import { MessageModule } from 'primeng/message';
 import { TooltipModule } from 'primeng/tooltip';
 import { DialogModule } from 'primeng/dialog';
-import { FilterService, MessageService } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 import { SkeletonModule } from 'primeng/skeleton';
 import { FleetRoutingModule } from './fleet-routing.module';
+import { TimelineModule } from 'primeng/timeline';
 
 @NgModule({
   declarations: [
@@ -29,6 +32,7 @@ import { FleetRoutingModule } from './fleet-routing.module';
     VehiclesTableComponent,
     DriversTableComponent,
     SkeletonTableComponent,
+    VehiclesHistoryComponent,
   ],
   imports: [
     CommonModule,
@@ -48,6 +52,7 @@ import { FleetRoutingModule } from './fleet-routing.module';
     DialogModule,
     TableModule,
     SkeletonModule,
+    TimelineModule,
   ],
   providers: [MessageService, FilterService],
 })

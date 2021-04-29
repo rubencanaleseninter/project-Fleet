@@ -24,7 +24,11 @@ export class AppComponent {
           icon: 'fas fa-user-friends',
           routerLink: '/fleet/drivers-table',
         },
-        { label: 'Histórico', icon: 'fas fa-file-alt' },
+        {
+          label: 'Histórico',
+          icon: 'fas fa-file-alt',
+          routerLink: '/fleet/vehicles-history',
+        },
       ],
     },
   ];
