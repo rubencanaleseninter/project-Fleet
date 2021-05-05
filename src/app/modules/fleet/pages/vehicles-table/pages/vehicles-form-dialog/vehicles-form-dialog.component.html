@@ -6,12 +6,10 @@
         *ngIf="f.type === 'input'"
         class="form-control"
         [class.invalid]="
-          this.form.controls[f.field].touched &&
-          this.form.controls[f.field].invalid
+          form.controls[f.field].touched && form.controls[f.field].invalid
         "
         [class.valid]="
-          this.form.controls[f.field].touched &&
-          this.form.controls[f.field].valid
+          form.controls[f.field].touched && form.controls[f.field].valid
         "
         [formControlName]="f.field"
         [formControlName]="f.field"
@@ -47,7 +45,7 @@
         <div class="d-flex flex-row">
           <p-inputSwitch [formControlName]="f.field"></p-inputSwitch>
           <span class="mx-3">
-            {{ this.form.controls[f.field].value ? "Activo" : "Inactivo" }}
+            {{ form.controls[f.field].value ? "Activo" : "Inactivo" }}
           </span>
         </div>
         <small *ngIf="!form.controls[f.field].value" class="text-danger"
