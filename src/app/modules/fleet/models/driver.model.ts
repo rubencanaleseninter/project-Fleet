@@ -1,7 +1,7 @@
 export class Driver {
   private _employeeId!: number;
   private _employeeName!: string;
-  private _vehicleId!: string[];
+  private _vehicleId!: string;
 
   get employeeId(): number {
     return this._employeeId;
@@ -17,10 +17,10 @@ export class Driver {
     this._employeeName = value;
   }
 
-  get vehicleId(): string[] {
+  get vehicleId(): string {
     return this._vehicleId;
   }
-  set vehicleId(value: string[]) {
+  set vehicleId(value: string) {
     this._vehicleId = value;
   }
 }

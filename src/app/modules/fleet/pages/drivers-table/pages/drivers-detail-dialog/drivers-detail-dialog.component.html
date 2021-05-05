@@ -1,0 +1,45 @@
+<div *ngIf="driverService.selectedDriver">
+  <div *ngFor="let col of driverService.cols">
+    <b>{{ col.header }}: </b>
+    <span [ngSwitch]="col.type">
+      <span *ngSwitchCase="'date'">
+        {{ driverService.selectedDriver[col.field] | date: "dd/MM/yyyy" }}
+      </span>
+      <span
+        *ngSwitchCase="'active'"
+        class="{{
+          driverService.selectedDriver[col.field]
+            ? 'custom-badge type-qualified w-100'
+            : ''
+        }}"
+      >
+        {{ driverService.selectedDriver[col.field] ? "Activo" : "" }}
+      </span>
+      <span *ngSwitchDefault>
+        {{ driverService.selectedDriver[col.field] }}
+      </span>
+    </span>
+  </div>
+  <div class="my-3">
+    <h5 class="py-3">Historial de vehículos</h5>
+    <div class="card p-3 overflow-auto">
+      <p-timeline
+        *ngIf="driverService.selectedDriver?.history; else noEventsTemplate"
+        [value]="driverService.selectedDriver.history"
+      >
+        <ng-template pTemplate="content" let-event>
+          <small class="p-text-secondary"
+            >{{ event.startDate }} - {{ event.endDate }}</small
+          >
+        </ng-template>
+        <ng-template pTemplate="opposite" let-event>
+          <i class="fas fa-car mr-1"></i>
+          {{ event.vehicle }}
+        </ng-template>
+      </p-timeline>
+      <ng-template #noEventsTemplate>
+        <span>No se han obtenido registros para este empleado</span>
+      </ng-template>
+    </div>
+  </div>
+</div>

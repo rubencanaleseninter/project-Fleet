@@ -1,0 +1,30 @@
+/* ===== PRIME ===== */
+
+:host ::ng-deep.p-dialog-header {
+  padding: 0.8em;
+}
+
+:host ::ng-deep.p-timeline-event {
+  min-height: 50px;
+}
+
+/* ===== CUSTOM ===== */
+.badge {
+  height: 14px;
+  width: 14px;
+  i {
+    height: 9px;
+  }
+}
+
+.title {
+  font-size: 1.3em;
+}
+
+.info {
+  &-container {
+    div {
+      line-height: 2;
+    }
+  }
+}

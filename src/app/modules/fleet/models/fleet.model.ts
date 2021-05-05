@@ -1,3 +1,5 @@
+import { Driver } from '../interfaces/driver.interface';
+
 export class Vehicle {
   private _rowId!: number;
   private _plate!: string;
@@ -22,6 +24,7 @@ export class Vehicle {
   private _environmentLabelId!: number;
   private _fuelConsumption!: number;
   private _observations!: string;
+  private _drivers!: Driver[];
 
   get rowId(): number {
     return this._rowId;
@@ -182,5 +185,12 @@ export class Vehicle {
   }
   set observations(value: string) {
     this._observations = value;
+  }
+
+  get drivers(): Driver[] {
+    return this._drivers;
+  }
+  set drivers(value: Driver[]) {
+    this._drivers = value;
   }
 }

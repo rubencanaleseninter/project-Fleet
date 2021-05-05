@@ -1,0 +1,149 @@
+<div class="container-fluid p-0">
+  <!-- TITLE -->
+  <div class="title p-1 pl-4 my-auto">
+    <b>{{ vehicleService.selectedVehicle.plate }}</b>
+    <br />
+    <b>{{ vehicleService.selectedVehicle.manufacturerName }} </b>
+    <b>{{ vehicleService.selectedVehicle.modelName }}</b>
+  </div>
+  <!-- INFO -->
+  <hr />
+  <div class="row">
+    <div class="info-container col-6">
+      <div class="col-12">
+        <div class="d-flex">
+          <b>Estado</b>
+          <span
+            class="d-flex align-items-center justify-content-center mx-2 my-auto p-1 rounded-circle text-white badge bg-{{
+              vehicleService.selectedVehicle.active ? 'success' : 'danger'
+            }}"
+            [pTooltip]="
+              vehicleService.selectedVehicle.active ? 'Activo' : 'Inactivo'
+            "
+            tooltipPosition="top"
+          >
+            <i
+              *ngIf="vehicleService.selectedVehicle.active"
+              class="fas fa-check"
+            ></i>
+            <i
+              *ngIf="!vehicleService.selectedVehicle.active"
+              class="fas fa-times"
+            ></i>
+          </span>
+        </div>
+        <div>
+          <b>Conductor</b>
+          <span>
+            {{
+              vehicleService.selectedVehicle.employeeName
+                ? vehicleService.selectedVehicle.employeeName
+                : "Sin asignar"
+            }}
+          </span>
+        </div>
+      </div>
+
+      <div class="col-12 my-3">
+        <div>
+          <b>Fecha de alta</b>
+          {{ vehicleService.selectedVehicle.entryDate | date: "dd/MM/yyyy" }}
+        </div>
+        <div>
+          <b>Fecha de baja</b>
+          {{ vehicleService.selectedVehicle.leavingDate | date: "dd/MM/yyyy" }}
+        </div>
+      </div>
+
+      <div class="col-12 my-3">
+        <div>
+          <b>Tipo de vehículo</b>
+          {{ vehicleService.selectedVehicle.vehicleTypeName }}
+        </div>
+        <div>
+          <b>Combustible</b>
+          {{ vehicleService.selectedVehicle.fuelTypeName }}
+        </div>
+        <div>
+          <b>Transmissión</b>
+          {{ vehicleService.selectedVehicle.transmissionTypeName }}
+        </div>
+        <div>
+          <b>Consumo</b>
+          {{ vehicleService.selectedVehicle.fuelConsumption }}
+          <span>&nbsp;l/100km</span>
+        </div>
+        <div>
+          <b>Emisiones</b>
+          {{ vehicleService.selectedVehicle.pollutingEmissions }}
+          <span>&nbsp;g/km</span>
+        </div>
+      </div>
+
+      <div class="col-12 my-3">
+        <div>
+          <b>Financiera</b>
+          {{ vehicleService.selectedVehicle.financialCompanyName }}
+        </div>
+        <div>
+          <b>Tipo de financiación</b>
+          {{ vehicleService.selectedVehicle.financingTypeName }}
+        </div>
+        <div>
+          <b>Número de contrato</b>
+          {{ vehicleService.selectedVehicle.contractNumber }}
+        </div>
+        <div>
+          <b>Cuota mensual</b>
+          {{ vehicleService.selectedVehicle.monthlyFee }}
+          <span>&nbsp;€</span>
+        </div>
+        <div>
+          <b>Kms máximos</b>
+          {{ vehicleService.selectedVehicle.maxMileage }}
+        </div>
+      </div>
+
+      <div class="col-12 mt-3">
+        <div>
+          <b>Delegación</b>
+          {{ vehicleService.selectedVehicle.assignedAtCompanyName }}
+        </div>
+        <div>
+          <b>Kilometraje</b>
+          {{ vehicleService.selectedVehicle.mileage }}
+        </div>
+        <div>
+          <b>Bastidor</b>
+          {{ vehicleService.selectedVehicle.carframe }}
+        </div>
+        <div>
+          <b>Observaciones</b>
+          {{ vehicleService.selectedVehicle.observations }}
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <b>Histórico de conductores</b>
+      <div class="card p-3 mt-3 overflow-auto">
+        <p-timeline
+          *ngIf="vehicleService.selectedVehicle?.history; else noEventsTemplate"
+          [value]="vehicleService.selectedVehicle.history"
+        >
+          <ng-template pTemplate="content" let-event>
+            <small class="p-text-secondary"
+              >{{ event.startDate }} - {{ event.endDate }}</small
+            >
+          </ng-template>
+          <ng-template pTemplate="opposite" let-event>
+            <i class="fas fa-user mr-1"></i>
+            {{ event.driver }}
+          </ng-template>
+        </p-timeline>
+        <ng-template #noEventsTemplate>
+          <span>No se han obtenido registros para este vehículo</span>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

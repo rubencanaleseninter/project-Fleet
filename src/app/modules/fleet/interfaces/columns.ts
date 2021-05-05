@@ -1,3 +1,5 @@
+import { Subscribable } from 'rxjs';
+
 export interface Columns {
   field: string;
   header: string;
@@ -5,6 +7,9 @@ export interface Columns {
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
-  options?: any;
+  options?: Subscribable<any[]>;
+  optionLabel?: string;
+  optionValue?: any;
   width?: string;
+  value?: any;
 }

@@ -1,0 +1,32 @@
+<form [formGroup]="driverForm" class="form">
+  <div class="py-4">
+    <label for="selectDriver">Selecciona un conductor</label>
+    <div class="col-lg-6 col-md-9 col-sm-12 mb-4 px-0">
+      <p-dropdown
+        *ngIf="driverOptions$ | async as options"
+        styleClass="w-100"
+        optionLabel="employeeName"
+        optionValue="employeeId"
+        formControlName="selectDriver"
+        [autoDisplayFirst]="false"
+        [options]="options"
+        [showClear]="true"
+        [filter]="true"
+        filterBy="employeeName"
+      ></p-dropdown>
+    </div>
+  </div>
+</form>
+<div class="float-right pb-3">
+  <button type="button" class="btn btn-secondary mr-4" (click)="ref.close()">
+    Cancelar
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    [disabled]="driverForm.invalid"
+    (click)="assignDriver($event)"
+  >
+    Guardar
+  </button>
+</div>

@@ -5,9 +5,9 @@ import { FleetComponent } from './pages/fleet.component';
 import { VehiclesTableComponent } from './pages/vehicles-table/vehicles-table.component';
 import { DriversTableComponent } from './pages/drivers-table/drivers-table.component';
 import { SkeletonTableComponent } from 'src/app/shared/components/skeleton-table/skeleton-table.component';
-import { VehiclesHistoryComponent } from './pages/vehicles-history/vehicles-history.component';
 
-import { FilterService, MessageService } from 'primeng/api';
+import { ConfirmationService, FilterService, MessageService } from 'primeng/api';
+import {DialogService} from 'primeng/dynamicdialog';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -25,6 +25,12 @@ import { TableModule } from 'primeng/table';
 import { SkeletonModule } from 'primeng/skeleton';
 import { FleetRoutingModule } from './fleet-routing.module';
 import { TimelineModule } from 'primeng/timeline';
+import { TreeTableModule } from 'primeng/treetable';
+import {ConfirmPopupModule} from 'primeng/confirmpopup';
+import { DriversDetailDialogComponent } from './pages/drivers-table/pages/drivers-detail-dialog/drivers-detail-dialog.component';
+import { VehiclesDetailDialogComponent } from './pages/vehicles-table/pages/vehicles-detail-dialog/vehicles-detail-dialog.component';
+import { VehiclesFormDialogComponent } from './pages/vehicles-table/pages/vehicles-form-dialog/vehicles-form-dialog.component';
+import { DriversFormDialogComponent } from './pages/drivers-table/pages/drivers-form-dialog/drivers-form-dialog.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +38,10 @@ import { TimelineModule } from 'primeng/timeline';
     VehiclesTableComponent,
     DriversTableComponent,
     SkeletonTableComponent,
-    VehiclesHistoryComponent,
+    DriversDetailDialogComponent,
+    VehiclesDetailDialogComponent,
+    VehiclesFormDialogComponent,
+    DriversFormDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -53,7 +62,9 @@ import { TimelineModule } from 'primeng/timeline';
     TableModule,
     SkeletonModule,
     TimelineModule,
+    TreeTableModule,
+    ConfirmPopupModule,
   ],
-  providers: [MessageService, FilterService],
+  providers: [MessageService, FilterService, ConfirmationService, DialogService],
 })
 export class FleetModule {}

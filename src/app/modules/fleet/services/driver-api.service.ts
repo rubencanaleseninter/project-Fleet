@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Subject, Observable, throwError, of } from 'rxjs';
+import { Observable, throwError, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Driver } from '../models/driver.model';
 
@@ -13,74 +13,7 @@ export class DriverApiService {
   private ALL_DRIVERS = '/all-drivers';
   private DRIVER = '/driver';
 
-  selectedDriver$ = new Subject<Driver>();
-  selectedDriver: any;
-  calendar = {
-    es: {
-      firstDayOfWeek: 1,
-      dayNames: [
-        'domingo',
-        'lunes',
-        'martes',
-        'miércoles',
-        'jueves',
-        'viernes',
-        'sábado',
-      ],
-      dayNamesShort: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
-      dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
-      monthNames: [
-        'enero',
-        'febrero',
-        'marzo',
-        'abril',
-        'mayo',
-        'junio',
-        'julio',
-        'agosto',
-        'septiembre',
-        'octubre',
-        'noviembre',
-        'diciembre',
-      ],
-      monthNamesShort: [
-        'ene',
-        'feb',
-        'mar',
-        'abr',
-        'may',
-        'jun',
-        'jul',
-        'ago',
-        'sep',
-        'oct',
-        'nov',
-        'dic',
-      ],
-      today: 'Hoy',
-      clear: 'Borrar',
-    },
-    today: new Date(),
-  };
-
   constructor(private http: HttpClient) {}
-
-  /* ===== OBSERVABLES ===== */
-
-  /**
-   * Observable selected driver
-   */
-  getSelectedDriver(): Observable<Driver> {
-    return this.selectedDriver$.asObservable();
-  }
-
-  /**
-   * Set selected driver
-   */
-  SetSelectedDriver(driver: Driver): void {
-    this.selectedDriver = driver;
-    this.selectedDriver$.next(driver);
-  }
 
   /* ===== API CALLS ===== */
 
@@ -111,9 +44,13 @@ export class DriverApiService {
     return of(
       Object.assign(
         {
+          active: true,
           employeeId: 1,
           employeeName: 'Antonio',
-          vehicleId: ['5964FVY'],
+          vehicleId: '5964FVY',
+          delegation: 'Eninter - Central',
+          startDate: new Date('01/04/2021'),
+          status: 'Disponible',
           history: [
             {
               vehicle: '5964FVY - Ford Fiesta',
@@ -138,10 +75,10 @@ export class DriverApiService {
   }
 
   /**
-   * Save a new or edited driver
+   * Assign vehicle driver
    * @param driver Driver
    */
-  saveDriver(driver: Driver): Observable<any> {
+  assignDriver(driver: Driver): Observable<any> {
     return this.http
       .post<Driver>(this.GATEWAY + this.API + this.DRIVER, driver)
       .pipe(catchError((err) => throwError(err)));

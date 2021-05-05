@@ -1,3 +1,5 @@
+import { Driver } from '../models/driver.model';
+
 export interface Vehicle {
   rowId?: number;
   plate?: string;
@@ -22,6 +24,8 @@ export interface Vehicle {
   environmentLabelId?: number;
   fuelConsumption?: number;
   observations?: string;
+  test?: string;
+  drivers?: Driver[];
 }
 
 export interface VehicleDto {
@@ -48,4 +52,6 @@ export interface VehicleDto {
   environmentLabelId?: number;
   fuelConsumption?: number;
   observations?: string;
+  test?: string;
+  drivers?: Driver[];
 }

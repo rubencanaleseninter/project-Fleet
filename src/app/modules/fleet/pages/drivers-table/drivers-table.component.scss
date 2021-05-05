@@ -1,9 +1,50 @@
 /* ===== PRIME ===== */
-:host ::ng-deep.p-timeline-event {
-  min-height: 50px;
+:host ::ng-deep.p-datatable .p-datatable-header {
+  border: none;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody {
+  & > tr {
+    background: #f8f9fa;
+    & > td {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      height: 50px;
+
+      &:hover {
+        cursor: pointer;
+        overflow: auto;
+        text-overflow: initial;
+      }
+    }
+  }
 }
 
 /* ===== CUSTOM ===== */
 .form {
   min-height: 62vh;
+}
+
+.custom-badge {
+  border-radius: 2px;
+  padding: 0.25em 0.5rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  text-align: center;
+}
+.type-inactive {
+  background-color: #ffcdd2;
+  color: #c63737;
+}
+
+.type-active {
+  background-color: #c8e6c9;
+  color: #256029;
+}
+
+.table-container {
+  padding-left: 80px;
 }

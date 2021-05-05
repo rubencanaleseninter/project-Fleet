@@ -2,31 +2,31 @@
   {
     "employeeId": 1,
     "employeeName": "Antonio",
-    "vehicleId": ["5964FVY"]
+    "vehicleId": "5964FVY"
   },
   {
     "employeeId": 2,
     "employeeName": "Vicente",
-    "vehicleId": ["3998JRT"]
+    "vehicleId": "3998JRT"
   },
   {
     "employeeId": 3,
     "employeeName": "Manuel",
-    "vehicleId": ["4021HRM"]
+    "vehicleId": "4021HRM"
   },
   {
     "employeeId": 4,
     "employeeName": "Abdul",
-    "vehicleId": ["2940KLM"]
+    "vehicleId": "2940KLM"
   },
   {
     "employeeId": 5,
     "employeeName": "Joan",
-    "vehicleId": ["3145BCD"]
+    "vehicleId": "3145BCD"
   },
   {
     "employeeId": 6,
     "employeeName": "Oriol",
-    "vehicleId": []
+    "vehicleId": null
   }
 ]

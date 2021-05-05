@@ -19,16 +19,6 @@ export class AppComponent {
           icon: 'fas fa-shuttle-van',
           routerLink: '/fleet/vehicles-table',
         },
-        {
-          label: 'Conductores',
-          icon: 'fas fa-user-friends',
-          routerLink: '/fleet/drivers-table',
-        },
-        {
-          label: 'Histórico',
-          icon: 'fas fa-file-alt',
-          routerLink: '/fleet/vehicles-history',
-        },
       ],
     },
   ];

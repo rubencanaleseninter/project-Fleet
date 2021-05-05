@@ -1,49 +1,28 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { MessageService } from 'primeng/api';
-import { forkJoin } from 'rxjs';
-import { Columns } from '../../interfaces/columns';
+import { Component } from '@angular/core';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { DialogService } from 'primeng/dynamicdialog';
 import { Driver } from '../../models/driver.model';
 import { DriverApiService } from '../../services/driver-api.service';
+import { DriverService } from '../../services/driver.service';
 import { VehicleApiService } from '../../services/vehicle-api.service';
+import { VehicleService } from '../../services/vehicle.service';
+import { DriversDetailDialogComponent } from './pages/drivers-detail-dialog/drivers-detail-dialog.component';
 
 @Component({
+  selector: 'app-drivers-table',
   templateUrl: './drivers-table.component.html',
   styleUrls: ['./drivers-table.component.scss'],
 })
-export class DriversTableComponent implements OnInit {
-  driverArray!: Driver[];
-  cols!: Columns[];
-  filters!: string[];
-  displayDetails = false;
-  displayForm = false;
-  formGroup = new FormGroup({});
-
+export class DriversTableComponent {
   constructor(
-    public vehicleService: VehicleApiService,
-    public driverService: DriverApiService,
-    private fb: FormBuilder,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService,
+    public vehicleService: VehicleService,
+    public vehicleApiService: VehicleApiService,
+    public driverService: DriverService,
+    public driverApiService: DriverApiService,
+    public dialogService: DialogService
   ) {}
-
-  ngOnInit(): void {
-    this.getData();
-  }
-
-  /**
-   * Get the vehicles & drivers subscription data
-   */
-  getData(): void {
-    const drivers$ = this.driverService.getAllDrivers();
-    const vehicleIds$ = this.vehicleService.getVehicleIds();
-
-    forkJoin([drivers$, vehicleIds$]).subscribe(([drivers, vehicleIds]) => {
-      this.driverArray = drivers;
-      this.createColumns(vehicleIds);
-      this.createFilters();
-      this.createForm();
-    });
-  }
 
   /**
    * Show toast message
@@ -58,118 +37,36 @@ export class DriversTableComponent implements OnInit {
   }
 
   /**
-   * Create the driver forms modal
-   */
-  createForm(): void {
-    this.formGroup = new FormGroup({});
-    this.cols.forEach((col) =>
-      this.formGroup.addControl(
-        col.field,
-        col.required
-          ? this.fb.control(
-              { value: null, disabled: col.disabled },
-              Validators.required
-            )
-          : this.fb.control({ value: null, disabled: col.disabled })
-      )
-    );
-  }
-
-  createColumns(vehicleIds: any[]): void {
-    this.cols = [
-      {
-        field: 'employeeId',
-        header: 'Código de empleado',
-        type: 'input',
-        disabled: true,
-        required: false,
-      },
-      {
-        field: 'employeeName',
-        header: 'Nombre',
-        type: 'input',
-        disabled: false,
-        required: true,
-      },
-      {
-        field: 'vehicleId',
-        header: 'Vehículo asignado',
-        type: 'select',
-        disabled: false,
-        required: false,
-        options: vehicleIds,
-      },
-    ];
-  }
-
-  /**
-   * Create field filters
-   */
-  createFilters(): void {
-    this.filters = this.cols.map((col) => col.field);
-  }
-
-  /**
    * Display driver detail modal
    * @param rowData Driver
    */
   showDriverDetails(rowData: Driver): void {
-    this.driverService.getDriver(rowData.employeeId).subscribe((res) => {
-      this.driverService.selectedDriver = res;
-      this.displayDetails = true;
+    this.driverApiService.getDriver(rowData.employeeId).subscribe((res) => {
+      this.driverService.setSelectedDriver(res);
+      const ref = this.dialogService.open(DriversDetailDialogComponent, {
+        header: 'Información',
+        width: '50%',
+      });
     });
-  }
-
-  /**
-   * Display add driver modal
-   */
-  showAddDriver(): void {
-    if (this.formGroup.controls.employeeId.disabled) {
-      this.formGroup.controls.employeeId.enable();
-    }
-    this.formGroup.reset();
-    this.displayForm = true;
-  }
-
-  /**
-   * Display edit driver modal
-   * @param rowData Driver
-   */
-  showEditDriver(rowData: Driver): void {
-    this.displayForm = true;
-    this.formGroup.patchValue(rowData);
-    if (this.formGroup.controls.employeeId.enabled) {
-      this.formGroup.controls.employeeId.disable();
-    }
-  }
-
-  /**
-   * Save the driver form on edit or create new
-   */
-  saveDriver(): void {
-    if (this.formGroup.invalid) {
-      this.displayMessage('error', 'Revise el formulario');
-    } else {
-      let driver = new Driver();
-      driver = this.formGroup.value;
-      // FIXME: Call this.driverService.saveDriver(driver).subscribe(()=>{this.displayEditDriver = false;this.displayMessage('success', 'Conductor guardado correctamente');});
-      this.displayForm = false;
-      this.displayMessage('success', 'Conductor guardado correctamente');
-    }
   }
 
   /**
    * Remove the selected driver
    * @param rowData Driver
    */
-  removeDriver(rowData: Driver): void {
-    if (rowData.vehicleId.length > 0) {
-      this.displayMessage(
-        'error',
-        'Este conductor tiene vehiculo asignado y no se puede eliminar'
-      );
-    } else {
-      // FIXME: Call this.driverService.deleteDriver(rowData.id).subscribe(()=>{this.displayMessage('success', 'Conductor eliminado correctamente');});
-    }
+  removeDriver(rowData: Driver, ev: any): void {
+    this.confirmationService.confirm({
+      target: ev.target,
+      message:
+        '¿Estás seguro de que deseas quitar al conductor de este vehículo?',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        // FIXME: Call this.driverApiService.deleteDriver(rowData.employeeId).subscribe(()=>{this.displayMessage('success', 'Conductor eliminado correctamente');});
+        this.driverService.setDriversOfSelectedVehicle(
+          this.vehicleService.selectedVehicle.drivers
+        );
+        this.displayMessage('success', 'Conductor eliminado correctamente');
+      },
+    });
   }
 }

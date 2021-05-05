@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Subject, Observable, throwError, of } from 'rxjs';
+import { Observable, throwError, of } from 'rxjs';
 import { Vehicle } from '../models/fleet.model';
-import { catchError, map } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { VehicleDto } from '../interfaces/fleet.interface';
 
 @Injectable({
@@ -22,74 +22,7 @@ export class VehicleApiService {
   private TRANSMISSION_TYPES = '/transmission_types';
   private ENVIRONMENT_LABEL_TYPES = '/environment_label_types';
 
-  selectedVehicle$ = new Subject<Vehicle>();
-  selectedVehicle: any;
-  calendar = {
-    es: {
-      firstDayOfWeek: 1,
-      dayNames: [
-        'domingo',
-        'lunes',
-        'martes',
-        'miércoles',
-        'jueves',
-        'viernes',
-        'sábado',
-      ],
-      dayNamesShort: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
-      dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
-      monthNames: [
-        'enero',
-        'febrero',
-        'marzo',
-        'abril',
-        'mayo',
-        'junio',
-        'julio',
-        'agosto',
-        'septiembre',
-        'octubre',
-        'noviembre',
-        'diciembre',
-      ],
-      monthNamesShort: [
-        'ene',
-        'feb',
-        'mar',
-        'abr',
-        'may',
-        'jun',
-        'jul',
-        'ago',
-        'sep',
-        'oct',
-        'nov',
-        'dic',
-      ],
-      today: 'Hoy',
-      clear: 'Borrar',
-    },
-    today: new Date(),
-  };
-
   constructor(private http: HttpClient) {}
-
-  /* ===== OBSERVABLES ===== */
-
-  /**
-   * Observable selected vehicle
-   */
-  getSelectedVehicle(): Observable<Vehicle> {
-    return this.selectedVehicle$.asObservable();
-  }
-
-  /**
-   * Set selected vehicle
-   */
-  SetSelectedVehicle(vehicle: Vehicle): void {
-    this.selectedVehicle = vehicle;
-    this.selectedVehicle$.next(vehicle);
-  }
 
   /* ===== API CALLS ===== */
 
@@ -141,7 +74,7 @@ export class VehicleApiService {
       environmentLabelId: 1,
       fuelConsumption: undefined,
       observations: 'Al coche fantástico no le funciona el Aire',
-      vehicleId: ['5964FVY'],
+      vehicleId: '5964FVY',
     });
   }
 
@@ -193,25 +126,6 @@ export class VehicleApiService {
   }
 
   /**
-   * Get vehicle ids
-   */
-  getVehicleIds(): Observable<Vehicle[]> {
-    return this.http.get<any[]>('/assets/vehicles.json').pipe(
-      map((res: any[]) => {
-        const vehicleIds: any[] = [];
-        res.forEach((vh: Vehicle) => {
-          vehicleIds.push({
-            name: vh.plate.toString(),
-            value: vh.plate,
-          });
-        });
-        return vehicleIds;
-      }),
-      catchError((err) => throwError(err))
-    );
-  }
-
-  /**
    * Get vehicle financing options
    */
   getFinancingTypes(): Observable<any[]> {
@@ -219,7 +133,7 @@ export class VehicleApiService {
     //   .get<any[]>(this.GATEWAY + this.API + this.FINANCING_TYPES)
     //   .pipe(catchError((err) => throwError(err)));
     return of([
-      { name: 'Sin asignar', value: 0 },
+      { name: 'Añade un nuevo valor', value: 0 },
       { name: 'Renting - 48 Meses', value: 1 },
     ]);
   }
@@ -232,7 +146,7 @@ export class VehicleApiService {
     //   .get<any[]>(this.GATEWAY + this.API + this.FINANCING_COMPANIES)
     //   .pipe(catchError((err) => throwError(err)));
     return of([
-      { name: 'Sin asignar', value: 0 },
+      { name: 'Añade un nuevo valor', value: 0 },
       { name: 'Alphabet', value: 1 },
       { name: 'Cooltra Motos SLU', value: 2 },
     ]);
@@ -246,7 +160,7 @@ export class VehicleApiService {
     //   .get<any[]>(this.GATEWAY + this.API + this.VEHICLE_TYPES)
     //   .pipe(catchError((err) => throwError(err)));
     return of([
-      { name: 'Sin asignar', value: 0 },
+      { name: 'Añade un nuevo valor', value: 0 },
       { name: 'Turismo', value: 1 },
       { name: 'Motocicleta', value: 2 },
       { name: 'Furgoneta', value: 3 },
@@ -262,7 +176,7 @@ export class VehicleApiService {
     //   .get<any[]>(this.GATEWAY + this.API + this.VEHICLE_MODELS)
     //   .pipe(catchError((err) => throwError(err)));
     return of([
-      { name: 'Sin asignar', value: 0 },
+      { name: 'Añade un nuevo valor', value: 0 },
       { name: 'Golf', value: 1 },
       { name: 'Polo', value: 2 },
       { name: 'Kangoo', value: 3 },
@@ -278,7 +192,6 @@ export class VehicleApiService {
     //   .get<any[]>(this.GATEWAY + this.API + this.COMBUSTIBLE_TYPES)
     //   .pipe(catchError((err) => throwError(err)));
     return of([
-      { name: 'Sin asignar', value: 0 },
       { name: 'Gasolina', value: 1 },
       { name: 'Diesel', value: 2 },
       { name: 'Híbrido', value: 3 },
@@ -294,7 +207,7 @@ export class VehicleApiService {
     //   .get<any[]>(this.GATEWAY + this.API + this.MANUFACTURERS)
     //   .pipe(catchError((err) => throwError(err)));
     return of([
-      { name: 'Sin asignar', value: 0 },
+      { name: 'Añade un nuevo valor', value: 0 },
       { name: 'Volkswagen', value: 1 },
       { name: 'Renault', value: 2 },
       { name: 'Yamaha', value: 3 },
@@ -309,7 +222,6 @@ export class VehicleApiService {
     //   .get<any[]>(this.GATEWAY + this.API + this.TRANSMISSION_TYPES)
     //   .pipe(catchError((err) => throwError(err)));
     return of([
-      { name: 'Sin asignar', value: 0 },
       { name: 'Manual', value: 1 },
       { name: 'Automática', value: 2 },
     ]);
@@ -323,7 +235,6 @@ export class VehicleApiService {
     //   .get<any[]>(this.GATEWAY + this.API + this.ENVIRONMENT_LABEL_TYPES)
     //   .pipe(catchError((err) => throwError(err)));
     return of([
-      { name: 'Sin asignar', value: 0 },
       { name: 'ZERO', value: 1 },
       { name: 'ECO', value: 2 },
       { name: 'B', value: 3 },
@@ -340,7 +251,7 @@ export class VehicleApiService {
     //   .get<any[]>(this.GATEWAY + this.API + this.DELEGATIONS)
     //   .pipe(catchError((err) => throwError(err)));
     return of([
-      { name: 'Sin asignar', value: 0 },
+      { name: 'Añade un nuevo valor', value: 0 },
       { name: 'Eninter - Central', value: 1 },
       { name: 'Maninter', value: 2 },
       { name: 'Serrot', value: 3 },
@@ -357,11 +268,10 @@ export class VehicleApiService {
     //   .get<any[]>(this.GATEWAY + this.API + this.EMPLOYEES)
     //   .pipe(catchError((err) => throwError(err)));
     return of([
-      { name: 'Sin asignar', value: 0 },
-      { name: '11199 - Rubén C.', value: 11199 },
-      { name: '12345 - Gerónimo K.', value: 12345 },
-      { name: '9876 - Lina M.', value: 9876 },
-      { name: '4753 - Dorotea T.', value: 4753 },
+      { employeeName: '11199 - Rubén C.', employeeId: 11199 },
+      { employeeName: '12345 - Gerónimo K.', employeeId: 12345 },
+      { employeeName: '9876 - Lina M.', employeeId: 9876 },
+      { employeeName: '4753 - Dorotea T.', employeeId: 4753 },
     ]);
   }
 

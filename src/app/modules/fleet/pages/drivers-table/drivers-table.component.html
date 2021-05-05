@@ -1,237 +1,81 @@
-<div class="p-4">
-  <h4 class="pb-2">Conductores</h4>
+<div class="py-4 pr-4 table-container">
   <p-table
-    *ngIf="driverArray; else drTemplate"
+    *ngIf="driverService.drivers; else drTemplate"
     #driverTable
-    [value]="driverArray"
-    [columns]="cols"
+    [value]="driverService.drivers"
+    [columns]="driverService.cols"
     [rows]="10"
     [(selection)]="driverService.selectedDriver"
-    [rowHover]="true"
-    [showCurrentPageReport]="true"
-    [paginator]="true"
-    dataKey="id"
-    currentPageReportTemplate="Mostrando {first} - {last} de {totalRecords} vehículos"
-    [globalFilterFields]="filters"
+    dataKey="rowId"
+    styleClass="p-datatable-sm"
+    [scrollable]="true"
+    scrollHeight="36vh"
   >
     <ng-template pTemplate="caption">
-      <div class="row">
-        <div class="col-lg-4 col-md-8 col-sm-10">
-          <input
-            #searchDriver
-            class="form-control"
-            type="search"
-            pInputText
-            placeholder="Buscar ..."
-            (input)="driverTable.filterGlobal(searchDriver.value, 'contains')"
-          />
-        </div>
-        <div class="col">
-          <p-button
-            label=" Añadir conductor"
-            (click)="showAddDriver()"
-          ></p-button>
+      <h5>Conductores</h5>
+      <small>
+        {{ vehicleService.selectedVehicle.plate }}
+        {{ vehicleService.selectedVehicle.manufacturerName }}
+        {{ vehicleService.selectedVehicle.modelName }}</small
+      >
+    </ng-template>
 
-          <button
-            type="button"
-            pButton
-            pRipple
-            class="p-button-success mx-4"
-            icon="pi pi-file-excel"
-            (click)="driverTable.exportCSV()"
-            pTooltip="Exportar tabla csv"
-            tooltipPosition="bottom"
-          ></button>
-        </div>
-      </div>
+    <ng-template pTemplate="colgroup" let-columns>
+      <colgroup>
+        <col *ngFor="let col of driverService.cols" [style.width]="col.width" />
+        <col style="width: 120px" />
+      </colgroup>
     </ng-template>
 
     <ng-template pTemplate="header" let-columns>
       <tr>
-        <th
-          *ngFor="let col of cols"
-          class="text-center"
-          [pSortableColumn]="col.field"
-        >
+        <th *ngFor="let col of driverService.cols" style="width: 140px">
           {{ col.header }}
-          <p-sortIcon
-            [field]="col.field"
-            ariaLabel="Activate to sort"
-            ariaLabelDesc="Activate to sort in descending order"
-            ariaLabelAsc="Activate to sort in ascending order"
-          ></p-sortIcon>
-          <p-columnFilter
-            type="text"
-            [field]="col.field"
-            display="menu"
-            [showMatchModes]="true"
-            [showAddButton]="false"
-            [showOperator]="false"
-          >
-            <ng-template pTemplate="header">
-              <h6 class="px-4 pt-3">{{ col.header }}</h6>
-            </ng-template>
-          </p-columnFilter>
         </th>
-        <th class="text-center"></th>
+        <th></th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-rowData let-columns="columns">
       <tr (click)="showDriverDetails(rowData)">
-        <td *ngFor="let col of columns" class="text-center">
-          {{ rowData[col.field] }}
+        <td *ngFor="let col of columns" [ngSwitch]="col.field">
+          <span
+            *ngSwitchCase="'active'"
+            class="{{ rowData[col.field] ? 'custom-badge type-active' : '' }}"
+          >
+            {{ rowData[col.field] ? "Activo" : "" }}
+          </span>
+          <span *ngSwitchDefault>
+            {{ rowData[col.field] }}
+          </span>
         </td>
-        <td class="text-center">
+        <td>
           <button
-            pButton
-            pRipple
-            type="button"
-            class="p-button-rounded p-button-outlined mx-2"
-            icon="pi pi-pencil"
-            pTooltip="Editar conductor"
-            tooltipPosition="bottom"
-            (click)="
-              showEditDriver(rowData);
-              $event.stopImmediatePropagation();
-              $event.preventDefault()
-            "
-          ></button>
-          <button
+            *ngIf="rowData.active"
             pButton
             pRipple
             type="button"
             icon="pi pi-times"
             class="p-button-rounded p-button-danger p-button-outlined mx-2"
-            pTooltip="Anular conductor"
+            pTooltip="Quitar conductor"
             tooltipPosition="bottom"
-            (click)="removeDriver(rowData); $event.stopPropagation()"
+            (click)="removeDriver(rowData, $event); $event.stopPropagation()"
           ></button>
         </td>
       </tr>
     </ng-template>
-
+    <!-- EMPTY -->
     <ng-template pTemplate="emptymessage" let-columns>
       <tr>
         <td [attr.colspan]="columns.length">No se han obtenido resultados</td>
       </tr>
     </ng-template>
   </p-table>
-
   <!-- LOADER -->
   <ng-template #drTemplate>
     <app-skeleton-table></app-skeleton-table>
   </ng-template>
 </div>
-
-<!-- FORM DRIVER DIALOG -->
-<p-dialog
-  *ngIf="displayForm"
-  [header]="
-    formGroup.controls.employeeId.value ? 'Editar conductor' : 'Nuevo conductor'
-  "
-  [style]="{ width: '50vw' }"
-  [modal]="true"
-  [(visible)]="displayForm"
->
-  <form [formGroup]="formGroup" class="form">
-    <div *ngFor="let col of cols">
-      <label [for]="col.field">{{ col.header }} </label>
-      <div class="col-lg-6 col-md-9 col-sm-12 mb-4 px-0">
-        <input
-          *ngIf="col.type === 'input'"
-          class="form-control"
-          [class.invalid]="
-            this.formGroup.controls[col.field].touched &&
-            this.formGroup.controls[col.field].invalid
-          "
-          [class.valid]="this.formGroup.controls[col.field].valid"
-          [formControlName]="col.field"
-          [formControlName]="col.field"
-          [name]="col.field"
-        />
-
-        <p-multiSelect
-          *ngIf="col.type === 'select'"
-          styleClass="w-100"
-          optionLabel="name"
-          optionValue="value"
-          defaultLabel="Selecciona una opción"
-          [options]="col.options"
-          [formControlName]="col.field"
-        ></p-multiSelect>
-
-        <p-calendar
-          *ngIf="col.type === 'date'"
-          styleClass="w-100"
-          dateFormat="dd.mm.yy"
-          [formControlName]="col.field"
-          [showButtonBar]="true"
-          [locale]="driverService.calendar.es"
-          [defaultDate]="driverService.calendar.today"
-        ></p-calendar>
-      </div>
-    </div>
-  </form>
-
-  <ng-template pTemplate="footer">
-    <button
-      type="button"
-      class="btn btn-secondary"
-      (click)="displayForm = false"
-    >
-      Cancelar
-    </button>
-    <button
-      type="button"
-      class="btn btn-primary"
-      [disabled]="formGroup.invalid"
-      (click)="saveDriver()"
-    >
-      Guardar
-    </button>
-  </ng-template>
-</p-dialog>
-
-<!-- DRIVER DETAIL DIALOG -->
-<p-dialog
-  header="Detalles del conductor"
-  [(visible)]="displayDetails"
-  [dismissableMask]="true"
-  [closable]="true"
-  [closeOnEscape]="true"
-  [style]="{ width: '50vw' }"
-  [modal]="true"
->
-  <div *ngFor="let col of cols">
-    <b>{{ col.header }}: </b>
-    <span *ngIf="driverService.selectedDriver">{{
-      driverService.selectedDriver[col.field]
-    }}</span>
-  </div>
-  <div class="my-3">
-    <h5 class="py-3">Historial de vehículos</h5>
-    <div class="card p-3 overflow-auto">
-      <p-timeline
-        *ngIf="driverService.selectedDriver?.history; else noEventsTemplate"
-        [value]="driverService.selectedDriver.history"
-      >
-        <ng-template pTemplate="content" let-event>
-          <small class="p-text-secondary"
-            >{{ event.startDate }} - {{ event.endDate }}</small
-          >
-        </ng-template>
-        <ng-template pTemplate="opposite" let-event>
-          <i class="fas fa-user mr-1"></i>
-          {{ event.vehicle }}
-        </ng-template>
-      </p-timeline>
-      <ng-template #noEventsTemplate>
-        <span>No se han obtenido registros para este empleado</span>
-      </ng-template>
-    </div>
-  </div>
-</p-dialog>
-
-<!-- TOAST -->
+<!-- MESSAGES -->
 <p-toast></p-toast>
+<p-confirmPopup></p-confirmPopup>
